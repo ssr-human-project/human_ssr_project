@@ -1,0 +1,84 @@
+gitignore id="jlwmqk"
+# =========================================================
+# FRONTEND (React)
+# =========================================================
+
+# dependencies
+frontend/ggori-salang/node_modules/
+
+# production build
+frontend/ggori-salang/build/
+
+# testing
+frontend/ggori-salang/coverage/
+
+# environment variables
+frontend/ggori-salang/.env
+frontend/ggori-salang/.env.*
+
+# logs
+frontend/ggori-salang/npm-debug.log*
+frontend/ggori-salang/yarn-debug.log*
+frontend/ggori-salang/yarn-error.log*
+
+
+# =========================================================
+# BACKEND (Spring Boot / Gradle)
+# =========================================================
+
+# gradle
+backend/.gradle/
+
+# build files
+backend/build/
+backend/out/
+
+# logs
+backend/*.log
+
+# application secret settings
+backend/src/main/resources/application-secret.properties
+backend/src/main/resources/application-local.properties
+
+
+# =========================================================
+# INTELLIJ
+# =========================================================
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+
+# =========================================================
+# VSCODE
+# =========================================================
+
+.vscode/
+
+
+# =========================================================
+# OS
+# =========================================================
+
+.DS_Store
+Thumbs.db
+
+
+# =========================================================
+# TEMP
+# =========================================================
+
+*.swp
+*.swo
+
+
+# =========================================================
+# ETC
+# =========================================================
+
+*.class
+*.jar
+*.war
+*.ear
