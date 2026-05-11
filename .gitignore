@@ -1,84 +1,61 @@
-gitignore id="jlwmqk"
-# =========================================================
-# FRONTEND (React)
-# =========================================================
+# =========================
+# Frontend (React)
+# =========================
 
-# dependencies
-frontend/ggori-salang/node_modules/
+frontend/node_modules
+frontend/build
+frontend/dist
 
-# production build
-frontend/ggori-salang/build/
+# 환경변수
+frontend/.env
 
-# testing
-frontend/ggori-salang/coverage/
+# 로그파일
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
-# environment variables
-frontend/ggori-salang/.env
-frontend/ggori-salang/.env.*
+# =========================
+# Backend (Spring Boot)
+# =========================
 
-# logs
-frontend/ggori-salang/npm-debug.log*
-frontend/ggori-salang/yarn-debug.log*
-frontend/ggori-salang/yarn-error.log*
+backend/.gradle
+backend/build
+backend/out
 
+# IntelliJ
+backend/.idea
+backend/*.iml
 
-# =========================================================
-# BACKEND (Spring Boot / Gradle)
-# =========================================================
+# VSCode
+.vscode
 
-# gradle
-backend/.gradle/
-
-# build files
-backend/build/
-backend/out/
-
-# logs
-backend/*.log
-
-# application secret settings
-backend/src/main/resources/application-secret.properties
-backend/src/main/resources/application-local.properties
-
-
-# =========================================================
-# INTELLIJ
-# =========================================================
-
-.idea/
-*.iml
-*.ipr
-*.iws
-
-
-# =========================================================
-# VSCODE
-# =========================================================
-
-.vscode/
-
-
-# =========================================================
+# =========================
 # OS
-# =========================================================
+# =========================
 
 .DS_Store
 Thumbs.db
 
+# =========================
+# Logs
+# =========================
 
-# =========================================================
-# TEMP
-# =========================================================
+*.log
 
+# =========================
+# IDE
+# =========================
+
+.idea
 *.swp
 *.swo
 
+# =========================
+# Dependency locks (선택)
+# =========================
 
-# =========================================================
-# ETC
-# =========================================================
+# npm 사용 시 유지
+# yarn.lock 사용 시 유지
 
-*.class
-*.jar
-*.war
-*.ear
+# package-lock.json
+# yarn.lock
