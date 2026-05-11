@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>회원가입</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="form-box">
+        <h2>회원가입</h2>
+        <p th:if="${error}" class="error-msg" th:text="${error}"></p>
+        <!-- th:object에 RegisterRequest 바인딩 -->
+        <form th:action="@{/auth/register}" method="post"
+              th:object="${registerRequest}">
+            <div>
+                <input type="text" th:field="*{username}" placeholder="아이디">
+                <!-- 검증 오류 메시지 표시 -->
+                <span th:if="${#fields.hasErrors('username')}"
+                      th:errors="*{username}" class="field-error"></span>
+            </div>
+            <div>
+                <input type="password" th:field="*{password}" placeholder="비밀번호 (8자 이상)">
+                <span th:if="${#fields.hasErrors('password')}"
+                      th:errors="*{password}" class="field-error"></span>
+            </div>
+            <div>
+                <input type="text" th:field="*{nickname}" placeholder="닉네임">
+                <span th:if="${#fields.hasErrors('nickname')}"
+                      th:errors="*{nickname}" class="field-error"></span>
+            </div>
+            <button type="submit">가입하기</button>
+        </form>
+        <a th:href="@{/auth/login}">이미 계정이 있으신가요?</a>
+    </div>
+</div>
+</body></html>
