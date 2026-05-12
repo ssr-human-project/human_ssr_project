@@ -18,10 +18,9 @@ public class CafeService {
         return cafeDAO.findByRegion(regionId);
     }
 
-    public List<CafeVO> searchCafes(int regionId, String petType, Double maxWeight) {
-        return cafeDAO.findByFilters(regionId, petType, maxWeight);
+    public List<CafeVO> searchCafes(int regionId, List<String> petTypes, Double maxWeight) {
+        return cafeDAO.findByFilters(regionId, petTypes, maxWeight);
     }
-
     // 카페 상세: 카페 정보 + 이미지 목록
     public Map<String, Object> getCafeDetail(int cafeId) {
         CafeVO cafe = cafeDAO.findById(cafeId);

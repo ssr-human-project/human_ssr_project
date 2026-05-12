@@ -32,11 +32,10 @@ public class CafeController {
     @GetMapping("/search")
     public ResponseEntity<List<CafeVO>> searchCafes(
             @RequestParam int regionId,
-            @RequestParam(required = false) String petType,
+            @RequestParam(required = false) List<String> petTypes,
             @RequestParam(required = false) Double maxWeight) {
-        return ResponseEntity.ok(cafeService.searchCafes(regionId, petType, maxWeight));
+        return ResponseEntity.ok(cafeService.searchCafes(regionId, petTypes, maxWeight));
     }
-
     /**
      * 카페 상세 조회 (비로그인도 가능)
      * GET /api/cafes/{cafeId}
