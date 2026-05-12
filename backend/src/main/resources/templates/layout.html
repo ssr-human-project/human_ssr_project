@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- $CONTENT_TITLE: 자식 페이지의 <title>이 여기에 삽입됨 -->
+    <title layout:title-pattern="$CONTENT_TITLE - 게시판">게시판</title>
+    <!-- CSS는 여기 한 곳에만 추가 → 모든 페이지에 자동 적용 -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- ── 네비게이션 ── -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <!-- 로고 -->
+        <a th:href="@{/board/list}" class="navbar-brand">
+            <span>📋</span> 게시판
+        </a>
+
+        <!-- 로그인 전 -->
+        <div class="navbar-menu" sec:authorize="isAnonymous()">
+            <a th:href="@{/auth/login}">로그인</a>
+            <a th:href="@{/auth/register}">회원가입</a>
+        </div>
+
+        <!-- 로그인 후 -->
+        <div class="navbar-user" sec:authorize="isAuthenticated()">
+            <strong sec:authentication="name"></strong> 님
+            <form th:action="@{/logout}" method="post" style="display:inline">
+                <button type="submit" class="btn btn-secondary btn-sm">
+                    로그아웃
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- ── 메인 컨텐츠 ── -->
+<main class="container">
+    <!-- 자식 페이지의 layout:fragment="content" 가 여기에 삽입됨 -->
+    <div layout:fragment="content"></div>
+</main>
+
+<!-- ── 푸터 ── -->
+<footer>
+    <p>© 2024 Board App</p>
+</footer>
+
+</body>
+</html>
