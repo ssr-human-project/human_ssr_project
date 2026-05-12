@@ -21,15 +21,23 @@ public class CafeDAO {
     }
 
     // 동적 필터링 (petType, maxWeight 선택적)
-    public List<CafeVO> findByFilters(int regionId, String petType, Double maxWeight) {
+    public List<CafeVO> findByFilters(int regionId, List<String> petTypes, Double maxWeight) {
         StringBuilder sql = new StringBuilder("SELECT * FROM CAFES WHERE region_id = ?");
         List<Object> params = new ArrayList<>();
         params.add(regionId);
 
-        if (petType != null && !petType.isEmpty()) {
-            sql.append(" AND allowed_pet_types LIKE ?");
-            params.add("%" + petType + "%");
+        // 반려동물 종류 복수 선택 (OR 조건)
+        if (petTypes != null && !petTypes.isEmpty()) {
+            sql.append(" AND (");
+            for (int i = 0; i < petTypes.size(); i++) {
+                if (i > 0) sql.append(" OR ");
+                sql.append("allowed_pet_types LIKE ?");
+                params.add("%" + petTypes.get(i) + "%");
+            }
+            sql.append(")");
         }
+
+        // 몸무게 조건
         if (maxWeight != null && maxWeight > 0) {
             sql.append(" AND max_weight >= ?");
             params.add(maxWeight);
