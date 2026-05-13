@@ -10,7 +10,10 @@
     "axios": "^1.16.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+<<<<<<< HEAD
     "react-quill-new": "^3.8.3",
+=======
+>>>>>>> d51c9638d47420810ad33e5d6459fe0db79d2b57
     "react-router-dom": "^7.15.0",
     "react-scripts": "5.0.1",
     "styled-components": "^6.4.1",
