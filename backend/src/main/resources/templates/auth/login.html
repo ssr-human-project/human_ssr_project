@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>로그인</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="form-box">
+        <h2>로그인</h2>
+        <p th:if="${param.error}" class="error-msg">
+            아이디 또는 비밀번호가 틀렸습니다.
+        </p>
+        <form th:action="@{/auth/login}" method="post">
+            <input type="text"     name="username" placeholder="아이디" required>
+            <input type="password" name="password" placeholder="비밀번호" required>
+            <button type="submit">로그인</button>
+        </form>
+        <a th:href="@{/auth/register}">계정이 없으신가요?</a>
+    </div>
+</div>
+</body></html>
