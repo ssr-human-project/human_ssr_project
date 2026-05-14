@@ -103,11 +103,11 @@
   gap: 8px;
   cursor: pointer;
 }
-.find-pw {
+.find-link {
   text-decoration: none;
-  color: #ff6f3d;
+  color: #777;
+  font-size: 14px;
 }
-
 /* 메인 로그인/회원가입 버튼 */
 .main-submit-btn {
   width: 100%;
