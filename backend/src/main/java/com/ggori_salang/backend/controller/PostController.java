@@ -4,6 +4,7 @@ import com.ggori_salang.backend.Service.PostService;
 import com.ggori_salang.backend.vo.PostVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,23 +58,30 @@ public class PostController {
      * PUT /api/posts/{postId}
      */
     @PutMapping("/{postId}")
-    public ResponseEntity<String> updatePost(@PathVariable int postId, @RequestBody PostVO post) {
+    public ResponseEntity<String> updatePost(@PathVariable int postId,
+                                             @RequestBody PostVO post,
+                                             Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
         post.setPostId(postId);
+        post.setUserId(userId);
         boolean isSuccess = postService.updatePost(post);
         return isSuccess
                 ? ResponseEntity.ok("게시글 수정 성공")
-                : ResponseEntity.badRequest().body("게시글 수정 실패");
+                : ResponseEntity.badRequest().body("본인 게시글만 수정할 수 있습니다.");
     }
 
     /**
      * 자유게시판 글 삭제
      * DELETE /api/posts/{postId}
      */
+    // deletePost 수정
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable int postId) {
-        boolean isSuccess = postService.deletePost(postId);
+    public ResponseEntity<String> deletePost(@PathVariable int postId,
+                                             Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        boolean isSuccess = postService.deletePost(postId, userId);
         return isSuccess
                 ? ResponseEntity.ok("게시글 삭제 성공")
-                : ResponseEntity.badRequest().body("게시글 삭제 실패");
+                : ResponseEntity.badRequest().body("본인 게시글만 삭제할 수 있습니다.");
     }
 }

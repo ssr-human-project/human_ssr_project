@@ -46,11 +46,26 @@ public class PostService {
         return result > 0;
     }
 
+    // updatePost 수정
     public boolean updatePost(PostVO post) {
+        PostVO existing = postDAO.findById(post.getPostId());
+        if (existing.getUserId() != post.getUserId()) {
+            return false; // 본인 아니면 수정 불가
+        }
         return postDAO.update(post) > 0;
     }
 
-    public boolean deletePost(int postId) {
+    // deletePost 수정
+    public boolean deletePost(int postId, int userId) {
+        PostVO existing = postDAO.findById(postId);
+        if (existing.getUserId() != userId) {
+            return false; // 본인 아니면 삭제 불가
+        }
         return postDAO.delete(postId) > 0;
     }
+
+    public boolean deletePostByAdmin(int postId) {
+        return postDAO.delete(postId) > 0;
+    }
+
 }

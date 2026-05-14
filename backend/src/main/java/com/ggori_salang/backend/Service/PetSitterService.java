@@ -44,11 +44,26 @@ public class PetSitterService {
         return result > 0;
     }
 
+    // updateSitterPost 수정
     public boolean updateSitterPost(PetSitterPostVO post) {
+        PetSitterPostVO existing = petSitterDAO.findById(post.getPostId());
+        if (existing.getUserId() != post.getUserId()) {
+            return false; // 본인 아니면 수정 불가
+        }
         return petSitterDAO.update(post) > 0;
     }
 
-    public boolean deleteSitterPost(int postId) {
+
+    // deleteSitterPost 수정
+    public boolean deleteSitterPost(int postId, int userId) {
+        PetSitterPostVO existing = petSitterDAO.findById(postId);
+        if (existing.getUserId() != userId) {
+            return false; // 본인 아니면 삭제 불가
+        }
+        return petSitterDAO.delete(postId) > 0;
+    }
+
+    public boolean deleteSitterPostByAdmin(int postId) {
         return petSitterDAO.delete(postId) > 0;
     }
 }

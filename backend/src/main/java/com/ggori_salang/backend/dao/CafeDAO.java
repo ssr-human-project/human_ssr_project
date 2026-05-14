@@ -101,9 +101,8 @@ public class CafeDAO {
                 "SELECT SEQ_CAFE.CURRVAL FROM DUAL", Integer.class);
     }
 
-    public int updateRating(int cafeId) {
-        // 리뷰는 CAFES 참조 없이 cafe_name으로 저장하므로 rating 갱신 없음
-        // 필요 시 구현
-        return 0;
+    public List<CafeVO> findAll() {
+        String sql = "SELECT * FROM CAFES ORDER BY cafe_id DESC";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(CafeVO.class));
     }
 }

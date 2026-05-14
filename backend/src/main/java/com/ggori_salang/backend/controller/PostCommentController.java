@@ -4,6 +4,7 @@ import com.ggori_salang.backend.Service.PostCommentService;
 import com.ggori_salang.backend.vo.PostCommentVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,11 +43,16 @@ public class PostCommentController {
      * 자유게시판 댓글 삭제
      * DELETE /api/posts/{postId}/comments/{commentId}
      */
+    // deleteComment 수정
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable int postId, @PathVariable int commentId) {
-        boolean isSuccess = postCommentService.deleteComment(commentId);
+    public ResponseEntity<String> deleteComment(@PathVariable int postId,
+                                                @PathVariable int commentId,
+                                                Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        boolean isSuccess = postCommentService.deleteComment(commentId, userId);
         return isSuccess
                 ? ResponseEntity.ok("댓글 삭제 성공")
-                : ResponseEntity.badRequest().body("댓글 삭제 실패");
+                : ResponseEntity.badRequest().body("본인 댓글만 삭제할 수 있습니다.");
     }
+
 }

@@ -1,11 +1,16 @@
 package com.ggori_salang.backend.config;
 
+import com.ggori_salang.backend.Service.CustomUserDetailService;
 import com.ggori_salang.backend.jwt.JwtAuthFilter;
 import com.ggori_salang.backend.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,52 +30,66 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailService customUserDetailService;
 
+    // =============================================
+    // 1. 관리자 페이지 - 세션 방식 (@Order(1) 먼저 적용)
+    // =============================================
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
         http
-                // JWT 방식이므로 CSRF 비활성화
+                .securityMatcher("/admin/**")
                 .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/login").permitAll()
+                        .anyRequest().hasRole("ADMIN")
+                )
+                .formLogin(form -> form
+                        .loginPage("/admin/login")
+                        .loginProcessingUrl("/admin/login")
+                        .defaultSuccessUrl("/admin/cafes", true)
+                        .failureUrl("/admin/login?error")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/admin/logout")
+                        .logoutSuccessUrl("/admin/login")
+                )
+                .authenticationProvider(daoAuthenticationProvider());
 
-                // JWT 방식이므로 세션 사용 안 함
+        return http.build();
+    }
+
+    // =============================================
+    // 2. 일반 사용자 API - JWT 방식 (@Order(2) 나중에 적용)
+    // =============================================
+    @Bean
+    @Order(2)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // CORS 설정 적용
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // URL별 권한 설정
                 .authorizeHttpRequests(auth -> auth
-
-                        // 회원가입, 로그인, 이메일/닉네임 중복체크 → 누구나
+                        // 1. 모든 경로에 대한 OPTIONS 요청을 무조건 허용 (Preflight 해결)
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        // 카페 조회 → 누구나 (비로그인도 가능)
-                        .requestMatchers(HttpMethod.GET, "/api/cafes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cafes/**").permitAll()
-
-                        // 지역 조회 → 누구나
+                        .requestMatchers(HttpMethod.GET, "/api/cafes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cafes/all").permitAll() // 추가
                         .requestMatchers(HttpMethod.GET, "/api/regions/**").permitAll()
-
-                        // 게시판/펫시터/리뷰 목록·상세 조회 → 누구나
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pet-sitter/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reviews").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
-
-                        // 카페 등록/수정/삭제 → ADMIN만
+                        .requestMatchers(HttpMethod.GET, "/api/board/**").permitAll()
                         .requestMatchers(HttpMethod.POST,   "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/cafes/**").hasRole("ADMIN")
-
-                        // 관리자 페이지 (Thymeleaf) → ADMIN만
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-
-                        // 나머지 모든 API → 로그인 필요
                         .anyRequest().authenticated()
                 )
-
-                // JWT 필터를 Security 필터 앞에 추가
                 .addFilterBefore(
                         new JwtAuthFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class
@@ -79,11 +98,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** CORS 설정 - React(3000포트)에서 Spring Boot(8111포트)로 요청 허용 */
+    // DaoAuthenticationProvider - 관리자 세션 로그인용
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(customUserDetailService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // React 주소
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

@@ -1,57 +1,49 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# =========================
+# Frontend (React)
+# =========================
 
-# dependencies
-/node_modules
-/.pnp
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+frontend/coverage/
+
+# =========================
+# Backend (Spring Boot)
+# =========================
+
+backend/.gradle/
+backend/build/
+backend/out/
+
+# =========================
+# Node / Package
+# =========================
+
+.pnp/
 .pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # =========================
-# Frontend (React)
+# IDE
 # =========================
 
-frontend/node_modules
-frontend/build
-frontend/dist
+.idea/
+*.iml
 
-# 환경변수
-frontend/.env
+.vscode/
 
-# 로그파일
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-
-# =========================
-# Backend (Spring Boot)
-# =========================
-
-backend/.gradle
-backend/build
-backend/out
-
-# IntelliJ
-backend/.idea
-backend/*.iml
-
-# VSCode
-.vscode
+*.swp
+*.swo
 
 # =========================
 # OS
@@ -66,20 +58,4 @@ Thumbs.db
 
 *.log
 
-# =========================
-# IDE
-# =========================
-
-.idea
-*.swp
-*.swo
-
-# =========================
-# Dependency locks (선택)
-# =========================
-
-# npm 사용 시 유지
-# yarn.lock 사용 시 유지
-
-# package-lock.json
-# yarn.lock
+/frontend/App.js

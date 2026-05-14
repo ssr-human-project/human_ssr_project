@@ -52,4 +52,14 @@ public class CafeService {
     public boolean deleteCafe(int cafeId) {
         return cafeDAO.deleteCafe(cafeId) > 0;
     }
+
+    // 전체 카페 목록 (관리자용)
+    public List<CafeVO> getAllCafes() {
+        return cafeDAO.findAll();
+    }
+
+    // 카페 단건 조회 (수정 폼용)
+    public CafeVO getCafeById(int cafeId) {
+        return cafeDAO.findById(cafeId);
+    }
 }

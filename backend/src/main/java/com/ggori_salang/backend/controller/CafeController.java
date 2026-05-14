@@ -25,6 +25,12 @@ public class CafeController {
         return ResponseEntity.ok(cafeService.getCafesByRegion(regionId));
     }
 
+    // 전체 카페 목록 (비로그인도 가능)
+    @GetMapping("/all")
+    public ResponseEntity<List<CafeVO>> getAllCafes() {
+        return ResponseEntity.ok(cafeService.getAllCafes());
+    }
+
     /**
      * 카페 필터링 검색 (비로그인도 가능)
      * GET /api/cafes/search?regionId=1&petType=소형견&maxWeight=7.0

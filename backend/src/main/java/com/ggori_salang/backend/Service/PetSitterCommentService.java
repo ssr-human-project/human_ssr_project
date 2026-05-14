@@ -21,7 +21,13 @@ public class PetSitterCommentService {
         return petSitterCommentDAO.insert(comment) > 0;
     }
 
-    public boolean deleteComment(int commentId) {
+    // deleteComment 수정
+    public boolean deleteComment(int commentId, int userId) {
+        PetSitterCommentVO existing = petSitterCommentDAO.findById(commentId);
+        if (existing.getUserId() != userId) {
+            return false; // 본인 아니면 삭제 불가
+        }
         return petSitterCommentDAO.delete(commentId) > 0;
     }
+
 }
