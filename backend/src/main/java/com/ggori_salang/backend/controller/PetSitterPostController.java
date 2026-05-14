@@ -4,6 +4,7 @@ import com.ggori_salang.backend.Service.PetSitterService;
 import com.ggori_salang.backend.vo.PetSitterPostVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,24 +58,32 @@ public class PetSitterPostController {
      * 펫시터 게시글 수정
      * PUT /api/pet-sitter/{postId}
      */
+    // update 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<String> update(@PathVariable int postId, @RequestBody PetSitterPostVO post) {
+    public ResponseEntity<String> update(@PathVariable int postId,
+                                         @RequestBody PetSitterPostVO post,
+                                         Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
         post.setPostId(postId);
+        post.setUserId(userId);
         boolean isSuccess = petSitterService.updateSitterPost(post);
         return isSuccess
                 ? ResponseEntity.ok("게시글 수정 성공")
-                : ResponseEntity.badRequest().body("게시글 수정 실패");
+                : ResponseEntity.badRequest().body("본인 게시글만 수정할 수 있습니다.");
     }
 
     /**
      * 펫시터 게시글 삭제
      * DELETE /api/pet-sitter/{postId}
      */
+    // delete 수정
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> delete(@PathVariable int postId) {
-        boolean isSuccess = petSitterService.deleteSitterPost(postId);
+    public ResponseEntity<String> delete(@PathVariable int postId,
+                                         Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        boolean isSuccess = petSitterService.deleteSitterPost(postId, userId);
         return isSuccess
                 ? ResponseEntity.ok("게시글 삭제 성공")
-                : ResponseEntity.badRequest().body("게시글 삭제 실패");
+                : ResponseEntity.badRequest().body("본인 게시글만 삭제할 수 있습니다.");
     }
 }

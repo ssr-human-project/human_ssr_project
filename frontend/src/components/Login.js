@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import "./Login.css";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import "../styles/Login.css";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import FindAccountModal from "./FindAccountModal";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  // 입력값 state
+  const [user_id, setUser_id] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isFindModalOpen, setFindModalOpen] = useState(false);
@@ -23,7 +24,10 @@ const Login = () => {
     try {
       const response = await axios.post(
         "http://localhost:8111/api/auth/login",
-        { email, password },
+        {
+          user_id: user_id,
+          password: password,
+        },
       );
 
       if (response.data.token) {
@@ -36,7 +40,7 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      alert("로그인에 실패했습니다. 이메일이나 비밀번호를 확인하세요.");
+      alert("로그인에 실패했습니다. 아이디이나 비밀번호를 확인하세요.");
       console.log(error);
     }
   };
@@ -50,15 +54,19 @@ const Login = () => {
         </div>
         <p className="auth-desc">반가워요! 다시 만나서 기뻐요.</p>
 
-        <form onSubmit={handleLogin}>
+        <p className="sub-title">반려견과 함께하는 특별한 시간</p>
+
+        <form className="auth-form" onSubmit={handleLogin}>
+          <h2>로그인</h2>
+
           <div className="input-group">
-            <label>이메일</label>
+            <label>아이디</label>
+
             <input
-              type="email"
-              placeholder="example@mail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              type="text"
+              placeholder="아이디를 입력하세요"
+              value={user_id}
+              onChange={(e) => setUser_id(e.target.value)}
             />
           </div>
 

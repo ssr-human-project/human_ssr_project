@@ -9,12 +9,13 @@ import java.util.List;
 public class ReviewVO {
     private int reviewId;
     private int userId;
-    private String nickname;  // 작성자 닉네임 (JOIN)
-    private String cafeName;  // 카페명 직접 저장
+    private String nickname;
+    private int cafeId;       // 추가
+    private String cafeName;  // JOIN으로 가져옴 (DB 컬럼 아님)
     private String title;
     private String content;
-    private int rating;       // 별점 1~5
+    private int rating;
     private int viewCount;
     private Date createdAt;
-    private List<String> imageUrls;  // Firebase URL 목록
+    private List<String> imageUrls;
 }

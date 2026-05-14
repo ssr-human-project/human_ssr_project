@@ -34,6 +34,7 @@ public class AuthService {
                     result.put("token", token);
                     result.put("role", u.getRole());
                     result.put("nickname", u.getNickname());
+                    result.put("userId", String.valueOf(u.getUserId()));
                     return result;
                 })
                 .orElse(null);

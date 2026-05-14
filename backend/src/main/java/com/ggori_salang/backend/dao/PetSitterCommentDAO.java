@@ -21,6 +21,12 @@ public class PetSitterCommentDAO {
                 new BeanPropertyRowMapper<>(PetSitterCommentVO.class), postId);
     }
 
+    public PetSitterCommentVO findById(int commentId) {
+        String sql = "SELECT * FROM PETSITTER_COMMENTS WHERE comment_id = ?";
+        return jdbcTemplate.queryForObject(sql,
+                new BeanPropertyRowMapper<>(PetSitterCommentVO.class), commentId);
+    }
+
     public int insert(PetSitterCommentVO comment) {
         String sql = "INSERT INTO PETSITTER_COMMENTS (comment_id, post_id, user_id, content) " +
                 "VALUES (SEQ_PETSITTER_COMMENT.NEXTVAL, ?, ?, ?)";

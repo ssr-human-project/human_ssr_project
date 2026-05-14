@@ -13,15 +13,26 @@ public class ReviewDAO {
     private final JdbcTemplate jdbcTemplate;
 
     public List<ReviewVO> findAll() {
-        String sql = "SELECT r.*, u.nickname FROM REVIEWS r " +
+        String sql = "SELECT r.*, u.nickname, c.cafe_name FROM REVIEWS r " +
                 "JOIN USERS u ON r.user_id = u.user_id " +
+                "JOIN CAFES c ON r.cafe_id = c.cafe_id " +
                 "ORDER BY r.created_at DESC";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(ReviewVO.class));
     }
 
-    public ReviewVO findById(int reviewId) {
-        String sql = "SELECT r.*, u.nickname FROM REVIEWS r " +
+    public List<ReviewVO> findByUserId(int userId) {
+        String sql = "SELECT r.*, u.nickname, c.cafe_name FROM REVIEWS r " +
                 "JOIN USERS u ON r.user_id = u.user_id " +
+                "JOIN CAFES c ON r.cafe_id = c.cafe_id " +
+                "WHERE r.user_id = ? ORDER BY r.created_at DESC";
+        return jdbcTemplate.query(sql,
+                new BeanPropertyRowMapper<>(ReviewVO.class), userId);
+    }
+
+    public ReviewVO findById(int reviewId) {
+        String sql = "SELECT r.*, u.nickname, c.cafe_name FROM REVIEWS r " +
+                "JOIN USERS u ON r.user_id = u.user_id " +
+                "JOIN CAFES c ON r.cafe_id = c.cafe_id " +
                 "WHERE r.review_id = ?";
         return jdbcTemplate.queryForObject(sql,
                 new BeanPropertyRowMapper<>(ReviewVO.class), reviewId);
@@ -32,19 +43,13 @@ public class ReviewDAO {
         return jdbcTemplate.queryForList(sql, String.class, reviewId);
     }
 
-    public List<ReviewVO> findByUserId(int userId) {
-        String sql = "SELECT r.*, u.nickname FROM REVIEWS r " +
-                "JOIN USERS u ON r.user_id = u.user_id " +
-                "WHERE r.user_id = ? ORDER BY r.created_at DESC";
-        return jdbcTemplate.query(sql,
-                new BeanPropertyRowMapper<>(ReviewVO.class), userId);
-    }
-
     public int insert(ReviewVO review) {
-        String sql = "INSERT INTO REVIEWS (review_id, user_id, cafe_name, title, content, rating) " +
+        System.out.println("userId: " + review.getUserId());  // 추가
+        System.out.println("cafeId: " + review.getCafeId());  // 추가
+        String sql = "INSERT INTO REVIEWS (review_id, user_id, cafe_id, title, content, rating) " +
                 "VALUES (SEQ_REVIEW.NEXTVAL, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
-                review.getUserId(), review.getCafeName(),
+                review.getUserId(), review.getCafeId(),
                 review.getTitle(), review.getContent(), review.getRating());
     }
 
@@ -75,4 +80,14 @@ public class ReviewDAO {
         return jdbcTemplate.queryForObject(
                 "SELECT SEQ_REVIEW.CURRVAL FROM DUAL", Integer.class);
     }
+    public List<ReviewVO> findByCafeId(int cafeId) {
+        String sql = "SELECT r.*, u.nickname, c.cafe_name FROM REVIEWS r " +
+                "JOIN USERS u ON r.user_id = u.user_id " +
+                "JOIN CAFES c ON r.cafe_id = c.cafe_id " +
+                "WHERE r.cafe_id = ? ORDER BY r.created_at DESC";
+        return jdbcTemplate.query(sql,
+                new BeanPropertyRowMapper<>(ReviewVO.class), cafeId);
+    }
+
+
 }

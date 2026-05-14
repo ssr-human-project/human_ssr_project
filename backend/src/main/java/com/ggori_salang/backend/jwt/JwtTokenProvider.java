@@ -23,11 +23,11 @@ public class JwtTokenProvider {
      */
     public String generateToken(int userId, String role) {
         return Jwts.builder()
-                .subject(String.valueOf(userId)) // setSubject -> subject
+                .setSubject(String.valueOf(userId)) // setSubject -> subject
                 .claim("role", role)
-                .issuedAt(new Date()) // setIssuedAt -> issuedAt
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS)) // setExpiration -> expiration
-                .signWith(key) // 최신 버전은 알고리즘을 자동으로 선택합니다.
+                .setIssuedAt(new Date()) // setIssuedAt -> issuedAt
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS)) // setExpiration -> expiration
+                .signWith(key, SignatureAlgorithm.HS256) // 최신 버전은 알고리즘을 자동으로 선택합니다.
                 .compact();
     }
 
@@ -53,10 +53,10 @@ public class JwtTokenProvider {
 
     // 핵심 수정 부분: parserBuilder() -> parser()
     private Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(key) // setSigningKey -> verifyWith
+        return Jwts.parserBuilder()  // parser() → parserBuilder()
+                .setSigningKey(key)
                 .build()
-                .parseSignedClaims(token) // parseClaimsJws -> parseSignedClaims
-                .getPayload(); // getBody -> getPayload
+                .parseClaimsJws(token)  // parseSignedClaims → parseClaimsJws
+                .getBody();  // getPayload → getBody
     }
 }

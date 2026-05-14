@@ -21,7 +21,12 @@ public class PostCommentService {
         return postCommentDAO.insert(comment) > 0;
     }
 
-    public boolean deleteComment(int commentId) {
+    // deleteComment 수정
+    public boolean deleteComment(int commentId, int userId) {
+        PostCommentVO existing = postCommentDAO.findById(commentId);
+        if (existing.getUserId() != userId) {
+            return false; // 본인 아니면 삭제 불가
+        }
         return postCommentDAO.delete(commentId) > 0;
     }
 }

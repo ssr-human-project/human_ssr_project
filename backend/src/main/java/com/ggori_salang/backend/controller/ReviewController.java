@@ -4,6 +4,7 @@ import com.ggori_salang.backend.Service.ReviewService;
 import com.ggori_salang.backend.vo.ReviewVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,24 +59,39 @@ public class ReviewController {
      * 리뷰 수정
      * PUT /api/reviews/{reviewId}
      */
+    // updateReview 수정
     @PutMapping("/{reviewId}")
-    public ResponseEntity<String> updateReview(@PathVariable int reviewId, @RequestBody ReviewVO review) {
+    public ResponseEntity<String> updateReview(@PathVariable int reviewId,
+                                               @RequestBody ReviewVO review,
+                                               Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
         review.setReviewId(reviewId);
+        review.setUserId(userId);
         boolean isSuccess = reviewService.updateReview(review);
         return isSuccess
                 ? ResponseEntity.ok("리뷰 수정 성공")
-                : ResponseEntity.badRequest().body("리뷰 수정 실패");
+                : ResponseEntity.badRequest().body("본인 리뷰만 수정할 수 있습니다.");
     }
 
     /**
      * 리뷰 삭제
      * DELETE /api/reviews/{reviewId}
      */
+    // deleteReview 수정
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<String> deleteReview(@PathVariable int reviewId) {
-        boolean isSuccess = reviewService.deleteReview(reviewId);
+    public ResponseEntity<String> deleteReview(@PathVariable int reviewId,
+                                               Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        boolean isSuccess = reviewService.deleteReview(reviewId, userId);
         return isSuccess
                 ? ResponseEntity.ok("리뷰 삭제 성공")
-                : ResponseEntity.badRequest().body("리뷰 삭제 실패");
+                : ResponseEntity.badRequest().body("본인 리뷰만 삭제할 수 있습니다.");
+    }
+
+
+    // 추가
+    @GetMapping("/cafe/{cafeId}")
+    public ResponseEntity<List<ReviewVO>> getReviewsByCafe(@PathVariable int cafeId) {
+        return ResponseEntity.ok(reviewService.getReviewsByCafe(cafeId));
     }
 }

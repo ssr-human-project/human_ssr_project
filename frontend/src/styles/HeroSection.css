@@ -8,7 +8,8 @@
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(90deg, rgba(0,0,0,0.58), rgba(0,0,0,0.18), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=1600');
+  height: 470px;
+  background-image: linear-gradient(90deg, rgba(0,0,0,0.58), rgba(0,0,0,0.18), rgba(0,0,0,0.1)), url('./image/—Pngtree—three\ puppies\ with\ their\ mouths_3054035.jpg');
   background-size: cover;
   background-position: center 42%;
   transform: scale(1.03);
