@@ -1,3 +1,5 @@
+import "../../styles/section/CommunitySection.css";
+
 function CommunitySection() {
   const communityItems = [
     {

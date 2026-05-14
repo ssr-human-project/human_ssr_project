@@ -23,6 +23,7 @@
   font-weight: 900;
   font-size: 23px;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .header-search {

@@ -1,3 +1,5 @@
+import "../../styles/section/HeroSection.css";
+
 function HeroSection() {
   return (
     <section className="hero-section">

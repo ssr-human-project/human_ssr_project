@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./MyPage.css";
+import "../../styles/pages/MyPage.css";
 
 const MyPage = () => {
   const [activeMenu, setActiveMenu] = useState("profile");

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import "../styles/Login.css";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import "../../styles/pages/Login.css";
+import FindAccountModal from "../modal/FindAccountModal";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import FindAccountModal from "./FindAccountModal";
+
 
 const Login = () => {
   // 입력값 state

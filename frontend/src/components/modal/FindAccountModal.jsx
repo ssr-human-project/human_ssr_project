@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./FindAccountModal.css";
+import "../../styles/modal/FindAccountModal.css";
 
 const FindAccountModal = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState("email");
