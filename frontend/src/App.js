@@ -7,17 +7,32 @@ import {
 import "./App.css";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import MyPage from "./components/MyPage";
+
+// ✨ 인증 확인용 컴포넌트
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
-    // 1. 모든 것의 가장 바깥은 반드시 <Router>여야 합니다!
     <Router>
       <div className="App">
         <Routes>
-          {/* 2. 각 주소(path)에 맞는 컴포넌트를 연결합니다. */}
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+
+          {/* ✨ 마이페이지는 로그인한 사람만 들어갈 수 있게 보호 */}
+          <Route
+            path="/mypage"
+            element={
+              <PrivateRoute>
+                <MyPage />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </div>
     </Router>
