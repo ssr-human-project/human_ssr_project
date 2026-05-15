@@ -1,6 +1,9 @@
 import "../../styles/section/CommunitySection.css";
+import { useNavigate } from "react-router-dom";
 
 function CommunitySection() {
+  const navigate = useNavigate();
+
   const communityItems = [
     {
       title: "자유게시판",
@@ -8,6 +11,7 @@ function CommunitySection() {
       icon: "💬",
       color: "blue",
       tag: "소통하기",
+      path: "/posts",
     },
     {
       title: "펫시터",
@@ -15,6 +19,7 @@ function CommunitySection() {
       icon: "🐾",
       color: "green",
       tag: "찾아보기",
+      path: "/petsitters",
     },
     {
       title: "리뷰",
@@ -22,6 +27,7 @@ function CommunitySection() {
       icon: "☆",
       color: "orange",
       tag: "후기보기",
+      path: "/reviews",
     },
   ];
 
@@ -31,20 +37,36 @@ function CommunitySection() {
         <div>
           <span className="section-label">COMMUNITY</span>
           <h2 className="section-title">커뮤니티</h2>
-          <p className="section-subtitle">반려견과 함께하는 일상을 공유하세요</p>
+          <p className="section-subtitle">
+            반려견과 함께하는 일상을 공유하세요
+          </p>
         </div>
       </div>
 
       <div className="community-card-wrap">
         {communityItems.map((item, index) => (
-          <div className="community-card" key={index}>
+          <div
+            className="community-card"
+            key={index}
+            onClick={() => navigate(item.path)}
+            style={{ cursor: "pointer" }}
+          >
             <div className={`community-icon ${item.color}`}>
               <span>{item.icon}</span>
             </div>
+
             <div className="community-text">
               <h3>{item.title}</h3>
               <p>{item.desc}</p>
-              <button>{item.tag} →</button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(item.path);
+                }}
+              >
+                {item.tag} →
+              </button>
             </div>
           </div>
         ))}
