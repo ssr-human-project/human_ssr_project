@@ -352,3 +352,6 @@
     flex-direction: column;
   }
 }
+.heart-icon {
+  pointer-events: none;
+}
