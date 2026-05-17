@@ -8,6 +8,35 @@ import "../../styles/section/PopularRegions.css";
 
 import { getRegions } from "../../api/regionApi";
 
+import seoul from "./imges/seoul.jpg";
+import busan from "./imges/busan.jpg";
+import daegu from "./imges/daegu.jpg";
+import incheon from "./imges/incheon.jpg";
+import gyeongju from "./imges/gyeongju.jpg";
+import daejeon from "./imges/daejeon.jpg";
+import ulsan from "./imges/ulsan.jpg";
+import sejong from "./imges/sejong.jpg";
+import gyeonggi from "./imges/gyeonggi.jpg";
+import gangneung from "./imges/gangneung.jpg";
+import jeju from "./imges/jeju.jpg";
+
+const regionImages = {
+  "seoul.jpg": seoul,
+  "busan.jpg": busan,
+  "daegu.jpg": daegu,
+  "incheon.jpg": incheon,
+  "gyeongju.jpg": gyeongju,
+  "daejeon.jpg": daejeon,
+  "ulsan.jpg": ulsan,
+  "sejong.jpg": sejong,
+  "gyeonggi.jpg": gyeonggi,
+  "gangneung.jpg": gangneung,
+  "jeju.jpg": jeju,
+};
+
+const fallbackImage =
+  "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600";
+
 function PopularRegions() {
   const [regions, setRegions] = useState([]);
   const navigate = useNavigate();
@@ -30,9 +59,6 @@ function PopularRegions() {
     const fetchRegions = async () => {
       try {
         const response = await getRegions();
-
-        console.log("지역 데이터:", response.data);
-
         setRegions(response.data);
       } catch (error) {
         console.error("지역 조회 실패", error);
@@ -52,6 +78,7 @@ function PopularRegions() {
             원하시는 지역의 애견카페를 찾아보세요
           </p>
         </div>
+
         <button className="more-btn" onClick={() => navigate("/cafes")}>
           전체보기
         </button>
@@ -59,17 +86,27 @@ function PopularRegions() {
 
       <div className="region-slider-wrap">
         <Slider {...settings} className="region-slider">
-          {regions.map((region, index) => (
-            <div key={region.regionId} className="region-slide">
-              <div
-                className="region-card"
-                onClick={() => navigate(`/cafes?regionId=${region.regionId}`)}
-              >
-                <div className={`region-image region-image-${index}`} />
-                <span className="region-name">{region.regionName}</span>
+          {regions.map((region) => {
+            const image = regionImages[region.imageUrl] || fallbackImage;
+
+            return (
+              <div key={region.regionId} className="region-slide">
+                <div
+                  className="region-card"
+                  onClick={() => navigate(`/cafes?regionId=${region.regionId}`)}
+                >
+                  <div
+                    className="region-image"
+                    style={{
+                      backgroundImage: `url(${image})`,
+                    }}
+                  />
+
+                  <span className="region-name">{region.regionName}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </Slider>
       </div>
     </section>

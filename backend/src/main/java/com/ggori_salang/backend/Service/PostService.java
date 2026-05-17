@@ -68,4 +68,16 @@ public class PostService {
         return postDAO.delete(postId) > 0;
     }
 
+    public List<PostVO> searchPosts(String keyword) {
+    List<PostVO> posts = postDAO.searchPosts(keyword);
+
+    for (PostVO post : posts) {
+        post.setImageUrls(
+                postDAO.findImagesByPostId(post.getPostId())
+        );
+    }
+
+    return posts;
+}
+
 }
