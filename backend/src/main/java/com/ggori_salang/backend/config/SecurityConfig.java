@@ -88,6 +88,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,   "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/cafes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll() // 댓글 조회 허용
+                        .requestMatchers(HttpMethod.POST, "/api/comments/**").permitAll() // ⭐ 댓글 등록 허용 (로그인 체크를 JWT가 하도록)
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**").permitAll() // 댓글 삭제 허용
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

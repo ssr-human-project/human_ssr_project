@@ -1,8 +1,9 @@
+import React from "react";
+import { useNavigate } from "react-router-dom"; // 1. useNavigate 임포트
 import "../../styles/section/CommunitySection.css";
-import { useNavigate } from "react-router-dom";
 
 function CommunitySection() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 2. navigate 함수 생성
 
   const communityItems = [
     {
@@ -11,7 +12,7 @@ function CommunitySection() {
       icon: "💬",
       color: "blue",
       tag: "소통하기",
-      path: "/posts",
+      path: "/posts", // 이동할 경로 추가
     },
     {
       title: "펫시터",
@@ -19,7 +20,7 @@ function CommunitySection() {
       icon: "🐾",
       color: "green",
       tag: "찾아보기",
-      path: "/petsitters",
+      path: "/petsitters", // 이동할 경로 추가
     },
     {
       title: "리뷰",
@@ -27,7 +28,7 @@ function CommunitySection() {
       icon: "☆",
       color: "orange",
       tag: "후기보기",
-      path: "/reviews",
+      path: "/reviews", // 이동할 경로 추가
     },
   ];
 
@@ -37,34 +38,21 @@ function CommunitySection() {
         <div>
           <span className="section-label">COMMUNITY</span>
           <h2 className="section-title">커뮤니티</h2>
-          <p className="section-subtitle">
-            반려견과 함께하는 일상을 공유하세요
-          </p>
+          <p className="section-subtitle">반려견과 함께하는 일상을 공유하세요</p>
         </div>
       </div>
 
       <div className="community-card-wrap">
         {communityItems.map((item, index) => (
-          <div
-            className="community-card"
-            key={index}
-            onClick={() => navigate(item.path)}
-            style={{ cursor: "pointer" }}
-          >
+          <div className="community-card" key={index}>
             <div className={`community-icon ${item.color}`}>
               <span>{item.icon}</span>
             </div>
-
             <div className="community-text">
               <h3>{item.title}</h3>
               <p>{item.desc}</p>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(item.path);
-                }}
-              >
+              {/* 3. onClick 이벤트 추가 */}
+              <button onClick={() => navigate(item.path)}>
                 {item.tag} →
               </button>
             </div>

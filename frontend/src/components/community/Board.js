@@ -61,11 +61,11 @@ const Board = () => {
   const getDisplayInfo = (item) => {
     switch (item.type) {
       case 'post':
-        return { label: '자유게시판', path: `/posts/${item.postId}`, sub: `조회 ${item.viewCount}`, state: {} };
+        return { label: '자유게시판', path: `/posts/${item.postId}`, state: { post: item} };
       case 'review':
         return { label: '리뷰', path: `/reviews/${item.reviewId}`, sub: item.cafeName, state: { review: item } };
       case 'sitter':
-        return { label: '펫시터 구인', path: `/pet-sitter/${item.postId}`, sub: `📍 ${item.region}`, state: {} };
+        return { label: '펫시터 구인', path: `/petsitters/${item.postId}`, sub: `📍 ${item.region}`, state: { post: item } };
       default:
         return { label: '게시판', path: '#', sub: '', state: {} };
     }
@@ -98,7 +98,7 @@ const Board = () => {
                   </CardHeader>
                   <Title>{item.title}</Title>
                   <Summary>
-                    {item.content ? item.content.replace(/<[^>]*>?/gm, '') : ''}
+                    {item.content ? item.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ') : ""}
                   </Summary>
                   <div style={{ fontSize: "0.85rem", color: "#999" }}>
                     {item.nickname} · {new Date(item.createdAt).toLocaleDateString()}

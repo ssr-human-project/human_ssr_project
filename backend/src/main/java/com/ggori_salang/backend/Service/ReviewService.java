@@ -78,7 +78,12 @@ public class ReviewService {
 
     // 추가
     public List<ReviewVO> getReviewsByCafe(int cafeId) {
-        return reviewDAO.findByCafeId(cafeId);
+        List<ReviewVO> reviews = reviewDAO.findByCafeId(cafeId);
+        for (ReviewVO review : reviews) {
+            List<String> images = reviewDAO.findImagesByReviewId(review.getReviewId());
+            review.setImageUrls(images);
+        }
+        return reviews;
     }
 
     public boolean deleteReviewByAdmin(int reviewId) {

@@ -16,7 +16,6 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/");
     }
   }, [navigate]);
 
@@ -26,17 +25,20 @@ const Login = () => {
       const response = await axios.post(
         "http://localhost:8111/api/auth/login",
         {
-          user_id: user_id,
+          email: user_id,
           password: password,
         },
       );
 
       if (response.data.token) {
+
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("nickname", response.data.nickname);
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", "true");
-        }
+              localStorage.setItem("nickname", response.data.nickname);
+
+              // ⭐ 핵심: 서버가 보내준 실제 유저 번호를 저장해야 합니다!
+              // 서버 응답 구조가 { userId: 5, token: "...", ... } 형태인지 확인하세요.
+              localStorage.setItem("userId", response.data.userId);
+
         alert(`${response.data.nickname}님 환영합니다!`);
         navigate("/");
       }
