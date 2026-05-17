@@ -1,51 +1,53 @@
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin, Heart } from "lucide-react";
 import { useState } from "react";
-import { api } from "../../api/axiosApi";
-
+import api from "../../api/axios";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=600";
 
 function getBadgeLabel(allowedPetTypes) {
   if (!allowedPetTypes) return "카페";
+
   const types = allowedPetTypes.split(",").map((t) => t.trim());
+
   if (types.includes("대형견")) return "대형 카페";
   if (types.includes("중형견")) return "중형 카페";
   if (types.includes("소형견")) return "소형 카페";
+
   return "감성 카페";
 }
 
-// facilities가 배열로 올 수도, 쉼표 구분 문자열로 올 수도 있음
 function toTagArray(value) {
   if (!value) return [];
   if (Array.isArray(value)) return value.filter(Boolean);
+
   return value
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
 }
 
-// ✨ 수정 후 (완성본 코드)
 export default function CafeListItem({ cafe }) {
   const navigate = useNavigate();
   const [wished, setWished] = useState(false);
 
   const id = cafe.cafeId || cafe.id;
-  const name = cafe.cafeName || cafe.title;
-  const image = cafe.imageUrls?.[0] || cafe.image || FALLBACK_IMAGE;
-  const rating = cafe.rating || 0;
+  const name = cafe.cafeName || cafe.title || "이름 없는 카페";
+  const image =
+    cafe.imageUrls?.[0] ||
+    cafe.imageUrl ||
+    cafe.image ||
+    cafe.cafeThumbnail ||
+    FALLBACK_IMAGE;
+  const rating = Number(cafe.rating || 0);
 
-  // allowedPetTypes(string) → 반려동물 태그
   const petTags = toTagArray(cafe.allowedPetTypes || cafe.facilities);
-  // facilities — 배열 또는 string 모두 처리
   const facilityTags = toTagArray(cafe.facilities);
 
-  // 💡 [하트 찜하기 버튼 클릭 처리 함수]
   const handleWish = async (e) => {
     e.stopPropagation();
 
-    // ✨ useAuth 대신 브라우저 로컬 스토리지에 토큰이 있는지 직접 검사합니다!
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -55,8 +57,8 @@ export default function CafeListItem({ cafe }) {
     }
 
     try {
-      await api.favorites.toggle(id);
-      setWished((w) => !w);
+      await api.post(`/favorites/${id}`);
+      setWished((prev) => !prev);
     } catch (err) {
       console.error("찜하기 실패:", err);
     }
@@ -84,7 +86,6 @@ export default function CafeListItem({ cafe }) {
         e.currentTarget.style.transform = "translateY(0)";
       }}
     >
-      {/* 썸네일 */}
       <div
         style={{
           position: "relative",
@@ -108,6 +109,7 @@ export default function CafeListItem({ cafe }) {
           }}
           referrerPolicy="no-referrer"
         />
+
         <span
           style={{
             position: "absolute",
@@ -124,6 +126,7 @@ export default function CafeListItem({ cafe }) {
         >
           {getBadgeLabel(cafe.allowedPetTypes)}
         </span>
+
         <button
           onClick={handleWish}
           style={{
@@ -148,7 +151,6 @@ export default function CafeListItem({ cafe }) {
         </button>
       </div>
 
-      {/* 정보 영역 */}
       <div
         style={{
           flex: 1,
@@ -180,6 +182,7 @@ export default function CafeListItem({ cafe }) {
           >
             {name}
           </h3>
+
           <div
             style={{
               display: "flex",
@@ -213,7 +216,7 @@ export default function CafeListItem({ cafe }) {
           }}
         >
           <MapPin size={13} style={{ color: "#f97316", flexShrink: 0 }} />
-          {cafe.address}
+          {cafe.address || "주소 정보 없음"}
         </p>
 
         {cafe.description && (
@@ -304,6 +307,7 @@ export default function CafeListItem({ cafe }) {
                     {f}
                   </span>
                 ))}
+
                 {facilityTags.length > 3 && (
                   <span
                     style={{
