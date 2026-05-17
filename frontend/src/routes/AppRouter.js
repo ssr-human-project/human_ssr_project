@@ -11,54 +11,26 @@ import Login from "../components/pages/Login";
 import Signup from "../components/pages/Signup";
 import MyPage from "../components/pages/MyPage";
 
-import PostList from "../components/community/PostList";
-import Post from "../components/community/Post";
-import ReviewList from "../components/community/ReviewList";
-import Review from "../components/community/Review";
-import PetsitterList from "../components/community/PetsitterList";
-
-import WritePost from "../components/pages/community/WritePost";
-import WriteReview from "../components/pages/community/WriteReview";
-import WritePetsitter from "../components/pages/community/WritePetsitter";
-
-function MainPage() {
-  return (
-    <>
-      <HeroSection />
-      <PopularRegions />
-      <CommunitySection />
-    </>
-  );
-}
-
 function AppRouter() {
   return (
     <>
       <Header />
 
       <Routes>
-        {/* 메인 */}
-        <Route path="/" element={<MainPage />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <HeroSection />
+              <PopularRegions />
+              <CommunitySection />
+            </>
+          }
+        />
 
-        {/* 회원 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/mypage" element={<MyPage />} />
-
-        {/* 커뮤니티 - 자유게시판 */}
-        <Route path="/posts" element={<PostList />} />
-        <Route path="/posts/:id" element={<Post />} />
-        <Route path="/posts/write" element={<WritePost />} />
-
-        {/* 커뮤니티 - 리뷰 */}
-        <Route path="/reviews" element={<ReviewList />} />
-        <Route path="/reviews/:id" element={<Review />} />
-        <Route path="/reviews/write" element={<WriteReview />} />
-
-        {/* 커뮤니티 - 펫시터 */}
-        <Route path="/petsitters" element={<PetsitterList />} />
-        <Route path="/petsitters/:id" element={<Post />} />
-        <Route path="/petsitters/write" element={<WritePetsitter />} />
       </Routes>
 
       <Footer />
