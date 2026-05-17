@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// --- 스타일 컴포넌트 (기존 List 파일들과 동일한 스타일 유지) ---
+// --- 스타일 컴포넌트 (기존 코드와 동일) ---
 const Container = styled.div` display: flex; max-width: 1200px; margin: 40px auto; gap: 30px; font-family: 'Pretendard', sans-serif; padding: 0 20px; `;
 const Sidebar = styled.div` width: 220px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; `;
 const CommunityCard = styled.div` background: linear-gradient(135deg, #ff4d00, #ff8a00); color: white; padding: 25px; border-radius: 15px; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(255, 77, 0, 0.2); `;
@@ -25,27 +25,26 @@ const Board = () => {
   const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 1. 검색어 입력을 저장할 상태(State) 추가
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        // 1. 3개의 API를 동시에 호출하여 데이터 로드
         const [postsRes, reviewsRes, sittersRes] = await Promise.all([
           axios.get('http://localhost:8111/api/posts'),
           axios.get('http://localhost:8111/api/reviews'),
           axios.get('http://localhost:8111/api/pet-sitter')
         ]);
 
-        // 2. 각 데이터에 타입(type)을 부여하고 하나의 배열로 통합
         const combined = [
           ...postsRes.data.map(item => ({ ...item, type: 'post' })),
           ...reviewsRes.data.map(item => ({ ...item, type: 'review' })),
           ...sittersRes.data.map(item => ({ ...item, type: 'sitter' }))
         ];
 
-        // 3. 작성일(createdAt) 기준 내림차순(최신순) 정렬
         combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
         setAllData(combined);
       } catch (error) {
         console.error("통합 데이터 로딩 실패:", error);
@@ -57,7 +56,7 @@ const Board = () => {
     fetchAllData();
   }, []);
 
-  // 게시글 타입별로 표시할 라벨, 이동할 경로, 보조 정보를 반환하는 함수
+  // 게시글 타입별 정보 반환 함수
   const getDisplayInfo = (item) => {
     switch (item.type) {
       case 'post':
@@ -71,6 +70,14 @@ const Board = () => {
     }
   };
 
+  // 2. 검색어에 따라 데이터를 필터링하는 로직 추가
+  // 제목(title) 또는 내용(content)에 검색어가 포함된 항목만 걸러냅니다. (대소문자 구분 없음)
+  const filteredData = allData.filter(item => {
+    const titleMatch = item.title ? item.title.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    const contentMatch = item.content ? item.content.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    return titleMatch || contentMatch;
+  });
+
   return (
     <Container>
       <Sidebar>
@@ -82,12 +89,21 @@ const Board = () => {
       </Sidebar>
 
       <MainContent>
-        <SearchBar placeholder="궁금한 내용을 검색해보세요!" />
+        {/* 3. SearchBar 컴포넌트에 value와 onChange 이벤트 연결 */}
+        <SearchBar
+          placeholder="궁금한 내용을 검색해보세요!"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         {loading ? (
           <div style={{textAlign: 'center', padding: '50px'}}>데이터를 로딩 중입니다...</div>
+        ) : filteredData.length === 0 ? (
+          // 검색 결과가 없을 때의 예외 처리 추가
+          <div style={{textAlign: 'center', padding: '50px', color: '#999'}}>검색 결과가 없습니다.</div>
         ) : (
-          allData.map((item, index) => {
+          // 4. 기존 allData.map 대신 필터링된 filteredData.map을 렌더링
+          filteredData.map((item, index) => {
             const info = getDisplayInfo(item);
             return (
               <WideCard key={`${item.type}-${index}`} onClick={() => navigate(info.path, { state: info.state })}>
