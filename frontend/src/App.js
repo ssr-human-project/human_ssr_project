@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import React from 'react';
+import React from "react";
 
 // 공통 컴포넌트
 import Header from "./components/layout/Header";
@@ -13,22 +13,23 @@ import CommunitySection from "./components/section/CommunitySection";
 // 기능 컴포넌트
 import Login from "./components/pages/Login";
 import Signup from "./components/pages/Signup";
-import ReviewList from './components/community/ReviewList';
-import WriteReview from './components/community/WriteReview';
-import Review from './components/community/Review';
-import PostList from './components/community/PostList';
-import Post from './components/community/Post';
-import WritePost from './components/community/WritePost';
-import PetsitterList from './components/community/PetsitterList';
-import Petsitter from './components/community/Petsitter';
-import WritePetsitter from './components/community/WritePetsitter';
-import Board from './components/community/Board';
-import EditPetsitter from './components/community/EditPetsitter';
-import EditReview from './components/community/EditReview';
-import EditPost from './components/community/EditPost';
-import CafeDetail from './components/cafes/Cafedetail';
-import CafeList from './components/cafes/Cafelistitem';
-import SearchResults from './components/cafes/Searchresults';
+import MyPage from "./components/pages/MyPage";
+import ReviewList from "./components/community/ReviewList";
+import WriteReview from "./components/community/WriteReview";
+import Review from "./components/community/Review";
+import PostList from "./components/community/PostList";
+import Post from "./components/community/Post";
+import WritePost from "./components/community/WritePost";
+import PetsitterList from "./components/community/PetsitterList";
+import Petsitter from "./components/community/Petsitter";
+import WritePetsitter from "./components/community/WritePetsitter";
+import Board from "./components/community/Board";
+import EditPetsitter from "./components/community/EditPetsitter";
+import EditReview from "./components/community/EditReview";
+import EditPost from "./components/community/EditPost";
+import CafeDetail from "./components/cafes/Cafedetail";
+import CafeList from "./components/cafes/Cafelistitem";
+import SearchResults from "./components/cafes/Searchresults";
 
 // 스타일 시트
 import "./styles/index.css";
@@ -49,7 +50,7 @@ function App() {
           {/* 메인 루트(/) */}
           <Route
             path="/"
-            element = {
+            element={
               <>
                 <HeroSection />
                 <PopularRegions />
@@ -61,6 +62,7 @@ function App() {
           {/* 인증 관련 */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/mypage" element={<MyPage />} />
 
           {/* 리뷰 게시판 확장 */}
           <Route path="/reviews" element={<ReviewList />} />
