@@ -224,3 +224,131 @@
 .mt-30 {
   margin-top: 30px;
 }
+
+/* 마이페이지 활동 목록 */
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title-row h3 {
+  margin-bottom: 0;
+}
+
+.write-link-btn {
+  border: none;
+  background: #ff6f3d;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.activity-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  padding: 22px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+}
+
+.activity-card:hover {
+  transform: translateY(-3px);
+  border-color: #ffb69c;
+  box-shadow: 0 12px 24px rgba(255, 111, 61, 0.12);
+}
+
+.activity-card-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.activity-badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff0eb;
+  color: #ff6f3d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.review-badge {
+  background: #fff8df;
+  color: #f5a400;
+}
+
+.activity-card h4 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #222;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-card p {
+  margin: 0 0 12px;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.activity-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #999;
+  font-size: 13px;
+}
+
+.small-detail-btn {
+  width: auto;
+  min-width: 72px;
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .mypage-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .input-group-row {
+    flex-direction: column;
+  }
+
+  .half {
+    width: 100%;
+  }
+
+  .activity-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
