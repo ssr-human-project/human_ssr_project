@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import CafeListItem from "./Cafelistitem";
 import "../../styles/cafes/Searchresults.css";
 
-const PET_TYPES = ["전체", "소형견", "중형견", "대형견"];
 const FACILITIES = [
   "드라이룸",
   "실내수영장",
@@ -17,7 +16,6 @@ const FACILITIES = [
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const [cafes, setCafes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +25,7 @@ export default function SearchResults() {
   const [filterOpen, setFilterOpen] = useState(true);
 
   const regionId = searchParams.get("regionId");
-  const regionName = searchParams.get("regionName") || "전체";
+  const keywordParam = searchParams.get("keyword") || "";
 
   const [searchKeyword, setSearchKeyword] = useState("");
   const [favoriteIds, setFavoriteIds] = useState([]);
@@ -88,6 +86,7 @@ export default function SearchResults() {
   const fetchCafes = useCallback(
     async (petType, currentWeight) => {
       setLoading(true);
+
       try {
         // 💡 슬라이더 조작 시 백엔드 파라미터 미스매치로 데이터가 깨지는 것을 방지하기 위해
         // 일단 해당 지역(또는 전체)의 데이터를 안전하게 가져온 뒤 프론트에서 정밀 필터링하도록 주소 설계
@@ -154,14 +153,14 @@ export default function SearchResults() {
     fetchCafes(selectedPetType, maxWeight);
   }, [regionId, selectedPetType, maxWeight, fetchCafes]);
 
-  const toggleFacility = (f) =>
+  const toggleFacility = (f) => {
     setSelectedFacilities((prev) =>
       prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f],
     );
+  };
 
   return (
     <div className="sr-wrapper">
-      {/* ── 사이드바 필터 ── */}
       <aside className={`sr-sidebar ${filterOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <span className="sidebar-title">필터</span>
@@ -196,7 +195,9 @@ export default function SearchResults() {
                 {FACILITIES.map((f) => (
                   <button
                     key={f}
-                    className={`facility-tag ${selectedFacilities.includes(f) ? "active" : ""}`}
+                    className={`facility-tag ${
+                      selectedFacilities.includes(f) ? "active" : ""
+                    }`}
                     onClick={() => toggleFacility(f)}
                   >
                     {f}

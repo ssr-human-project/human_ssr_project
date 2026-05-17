@@ -5,6 +5,7 @@
 frontend/node_modules/
 frontend/build/
 frontend/dist/
+frontend/coverage/
 
 frontend/.env
 frontend/.env.local
@@ -12,15 +13,21 @@ frontend/.env.development.local
 frontend/.env.test.local
 frontend/.env.production.local
 
-frontend/coverage/
-
 # =========================
-# Backend (Spring Boot)
+# Backend (Spring Boot / Gradle)
 # =========================
 
 backend/.gradle/
 backend/build/
 backend/out/
+backend/bin/
+
+.gradle/
+build/
+out/
+bin/
+
+*.class
 
 # =========================
 # Node / Package
