@@ -13,7 +13,7 @@ public class CafeVO {
     private String phone;
     private String description;
     private String allowedPetTypes;  // "소형견,중형견,고양이"
-    private double maxWeight;
+    private Integer maxWeight;
     private double rating;
     private int favoriteCount;
     private Double latitude;

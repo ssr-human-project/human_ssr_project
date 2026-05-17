@@ -50,7 +50,7 @@ export default function SearchResults() {
           ? Number(cafe.maxWeight)
           : 999;
 
-      if (cafeLimitWeight < maxWeight) {
+      if (cafeLimitWeight >= maxWeight) {
         return false;
       }
     }
@@ -78,31 +78,37 @@ export default function SearchResults() {
   };
 
   const fetchCafes = useCallback(
-    async (petType, currentWeight) => {
+    async (petType, currentWeight) => { // 💡 매개변수로 명확하게 받음
       setLoading(true);
 
       try {
         let url = "http://localhost:8111/api/cafes";
         const params = {};
 
+        // 1순위: 검색 키워드가 있을 때 (키워드 검색)
         if (keywordParam.trim()) {
           url = "http://localhost:8111/api/cafes/search/keyword";
           params.keyword = keywordParam.trim();
-        } else if (petType !== "전체" || currentWeight < 50) {
+        }
+        // 2순위: 반려동물 타입 필터가 지정되었거나, 몸무게 필터가 변경되었을 때 (조건 검색)
+        else if (petType !== "전체" || currentWeight < 50) {
           url = "http://localhost:8111/api/cafes/search";
-          params.regionId = regionId || 1;
+          params.regionId = regionId ? Number(regionId) : 1; // 기본 지역 설정 필수
 
           if (petType !== "전체") {
             params.petTypes = petType;
           }
-
           if (currentWeight < 50) {
-            params.maxWeight = currentWeight;
+            params.maxWeight = currentWeight; // 💡 인자로 들어온 최신 무게값을 백엔드로 정확히 전달!
           }
-        } else if (regionId) {
+        }
+        // 3순위: 특정 지역 선택 상태일 때 (지역별 전체 조회)
+        else if (regionId) {
           url = "http://localhost:8111/api/cafes";
           params.regionId = regionId;
-        } else {
+        }
+        // 4순위: 아무 조건도 없을 때 (전체 조회)
+        else {
           url = "http://localhost:8111/api/cafes/all";
         }
 
@@ -115,7 +121,7 @@ export default function SearchResults() {
         setLoading(false);
       }
     },
-    [regionId, keywordParam],
+    [regionId, keywordParam], // maxWeight 의존성을 제거하여 불필요한 재렌더링 방지
   );
 
   useEffect(() => {

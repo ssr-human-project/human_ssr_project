@@ -30,7 +30,7 @@ public class AdminCafeController {
         CafeVO cafe = new CafeVO();
         cafe.setCafeId(0);        // 추가
         cafe.setRegionId(0);      // 추가
-        cafe.setMaxWeight(0.0);   // 추가
+        cafe.setMaxWeight(0);   // 추가
         cafe.setRating(0.0);      // 추가
         cafe.setFavoriteCount(0); // 추가
         cafe.setLatitude(0.0);    // 추가

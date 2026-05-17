@@ -23,7 +23,7 @@ public class CafeDAO {
         );
     }
 
-    public List<CafeVO> findByFilters(int regionId, List<String> petTypes, Double maxWeight) {
+    public List<CafeVO> findByFilters(int regionId, List<String> petTypes, Integer maxWeight) {
         StringBuilder sql = new StringBuilder("SELECT * FROM CAFES WHERE region_id = ?");
         List<Object> params = new ArrayList<>();
         params.add(regionId);
@@ -39,7 +39,7 @@ public class CafeDAO {
         }
 
         if (maxWeight != null && maxWeight > 0) {
-            sql.append(" AND max_weight >= ?");
+            sql.append(" AND max_weight <= ?");
             params.add(maxWeight);
         }
 
