@@ -13,12 +13,34 @@ const emptyPetData = {
   weight: "",
   description: "",
 };
+const cleanText = (value) => {
+  if (!value) return "";
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+};
+
+const formatDate = (dateValue) => {
+  if (!dateValue) return "날짜 없음";
+
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "날짜 없음";
+
+  return date.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState("profile");
   const [userData, setUserData] = useState(null);
   const [petData, setPetData] = useState(emptyPetData);
+  const [myPosts, setMyPosts] = useState([]);
+  const [myReviews, setMyReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,6 +54,10 @@ const MyPage = () => {
         navigate("/login");
         return;
       }
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
       const fallbackUser = {
         userId,
@@ -49,9 +75,7 @@ const MyPage = () => {
       try {
         const userResponse = await axios.get(
           `${API_BASE_URL}/api/users/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers },
         );
         setUserData({ ...fallbackUser, ...userResponse.data });
       } catch (error) {
@@ -62,9 +86,7 @@ const MyPage = () => {
       try {
         const petResponse = await axios.get(
           `${API_BASE_URL}/api/users/${userId}/pet`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers },
         );
 
         if (petResponse.data) {
@@ -79,6 +101,30 @@ const MyPage = () => {
         }
       } catch (error) {
         console.error("강아지 정보 조회 실패:", error);
+      }
+
+      try {
+        const postsResponse = await axios.get(
+          `${API_BASE_URL}/api/my/${userId}/posts`,
+          { headers },
+        );
+        setMyPosts(Array.isArray(postsResponse.data) ? postsResponse.data : []);
+      } catch (error) {
+        console.error("내 게시물 조회 실패:", error);
+        setMyPosts([]);
+      }
+
+      try {
+        const reviewsResponse = await axios.get(
+          `${API_BASE_URL}/api/my/${userId}/reviews`,
+          { headers },
+        );
+        setMyReviews(
+          Array.isArray(reviewsResponse.data) ? reviewsResponse.data : [],
+        );
+      } catch (error) {
+        console.error("내 리뷰 조회 실패:", error);
+        setMyReviews([]);
       } finally {
         setLoading(false);
       }
@@ -110,8 +156,11 @@ const MyPage = () => {
       return;
     }
 
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
     try {
-      // 1. 강아지 정보 저장
       const petPayload = {
         ...petData,
         weight: petData.weight === "" ? null : Number(petData.weight),
@@ -120,11 +169,7 @@ const MyPage = () => {
       const petResponse = await axios.put(
         `${API_BASE_URL}/api/users/${userId}/pet`,
         petPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers },
       );
 
       if (petResponse.data) {
@@ -138,17 +183,10 @@ const MyPage = () => {
         });
       }
 
-      // 2. 전화번호 저장
       await axios.put(
         `${API_BASE_URL}/api/users/${userId}/phone`,
-        {
-          phone: userData.phone,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { phone: userData.phone },
+        { headers },
       );
 
       alert("정보가 저장되었습니다.");
@@ -157,6 +195,7 @@ const MyPage = () => {
       alert("정보 저장에 실패했습니다.");
     }
   };
+
   if (loading) return <div className="mypage-container">로딩 중...</div>;
   if (!userData) return null;
 
@@ -278,6 +317,101 @@ const MyPage = () => {
     </div>
   );
 
+  const renderMyPosts = () => (
+    <div className="content-section">
+      <div className="section-title-row">
+        <h3>내 게시물</h3>
+        <button
+          type="button"
+          className="write-link-btn"
+          onClick={() => navigate("/write-post")}
+        >
+          글쓰기
+        </button>
+      </div>
+
+      {myPosts.length === 0 ? (
+        <div className="no-data">
+          <p>아직 작성한 게시물이 없습니다.</p>
+        </div>
+      ) : (
+        <div className="activity-list">
+          {myPosts.map((post) => (
+            <div
+              key={post.postId}
+              className="activity-card"
+              onClick={() =>
+                navigate(`/posts/${post.postId}`, { state: { post } })
+              }
+            >
+              <div className="activity-card-main">
+                <span className="activity-badge">자유게시판</span>
+                <h4>{post.title}</h4>
+                <p>{cleanText(post.content)}</p>
+                <div className="activity-meta">
+                  <span>{formatDate(post.createdAt)}</span>
+                  <span>조회 {post.viewCount ?? 0}</span>
+                </div>
+              </div>
+              <button type="button" className="detail-btn small-detail-btn">
+                보기
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderMyReviews = () => (
+    <div className="content-section">
+      <div className="section-title-row">
+        <h3>내 리뷰</h3>
+        <button
+          type="button"
+          className="write-link-btn"
+          onClick={() => navigate("/write-review")}
+        >
+          리뷰 쓰기
+        </button>
+      </div>
+
+      {myReviews.length === 0 ? (
+        <div className="no-data">
+          <p>아직 작성한 리뷰가 없습니다.</p>
+        </div>
+      ) : (
+        <div className="activity-list">
+          {myReviews.map((review) => (
+            <div
+              key={review.reviewId}
+              className="activity-card"
+              onClick={() =>
+                navigate(`/reviews/${review.reviewId}`, { state: { review } })
+              }
+            >
+              <div className="activity-card-main">
+                <span className="activity-badge review-badge">
+                  ★ {review.rating ?? 0}
+                </span>
+                <h4>{review.title}</h4>
+                <p>{cleanText(review.content)}</p>
+                <div className="activity-meta">
+                  <span>{review.cafeName || "카페명 없음"}</span>
+                  <span>{formatDate(review.createdAt)}</span>
+                  <span>조회 {review.viewCount ?? 0}</span>
+                </div>
+              </div>
+              <button type="button" className="detail-btn small-detail-btn">
+                보기
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="mypage-container">
       <div className="sidebar">
@@ -322,20 +456,8 @@ const MyPage = () => {
             </div>
           </div>
         )}
-        {activeMenu === "posts" && (
-          <div className="content-section">
-            <div className="no-data">
-              <p>내 게시물 기능은 추후 연결 예정입니다.</p>
-            </div>
-          </div>
-        )}
-        {activeMenu === "reviews" && (
-          <div className="content-section">
-            <div className="no-data">
-              <p>리뷰 기능은 추후 연결 예정입니다.</p>
-            </div>
-          </div>
-        )}
+        {activeMenu === "posts" && renderMyPosts()}
+        {activeMenu === "reviews" && renderMyReviews()}
       </div>
     </div>
   );

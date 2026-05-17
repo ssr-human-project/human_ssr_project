@@ -16,12 +16,33 @@ public class CafeService {
     private final CafeDAO cafeDAO;
 
     public List<CafeVO> getCafesByRegion(int regionId) {
-        return cafeDAO.findByRegion(regionId);
+    List<CafeVO> cafes = cafeDAO.findByRegion(regionId);
+
+    for (CafeVO cafe : cafes) {
+        cafe.setImageUrls(
+                cafeDAO.findImagesByCafeId(cafe.getCafeId())
+        );
     }
 
-    public List<CafeVO> searchCafes(int regionId, List<String> petTypes, Double maxWeight) {
-        return cafeDAO.findByFilters(regionId, petTypes, maxWeight);
+    return cafes;
+}
+
+    public List<CafeVO> searchCafes(
+        int regionId,
+        List<String> petTypes,
+        Double maxWeight
+) {
+    List<CafeVO> cafes =
+            cafeDAO.findByFilters(regionId, petTypes, maxWeight);
+
+    for (CafeVO cafe : cafes) {
+        cafe.setImageUrls(
+                cafeDAO.findImagesByCafeId(cafe.getCafeId())
+        );
     }
+
+    return cafes;
+}
     // 카페 상세: 카페 정보 + 이미지 목록
     public Map<String, Object> getCafeDetail(int cafeId) {
         CafeVO cafe = cafeDAO.findById(cafeId);
@@ -55,8 +76,16 @@ public class CafeService {
 
     // 전체 카페 목록 (관리자용)
     public List<CafeVO> getAllCafes() {
-        return cafeDAO.findAll();
+    List<CafeVO> cafes = cafeDAO.findAll();
+
+    for (CafeVO cafe : cafes) {
+        cafe.setImageUrls(
+                cafeDAO.findImagesByCafeId(cafe.getCafeId())
+        );
     }
+
+    return cafes;
+}
 
     // 카페 단건 조회 (수정 폼용)
     public CafeVO getCafeById(int cafeId) {
