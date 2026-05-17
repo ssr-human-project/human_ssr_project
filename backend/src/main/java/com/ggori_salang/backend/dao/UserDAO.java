@@ -46,4 +46,23 @@ public class UserDAO {
                 user.getNickname(), user.getPhone(),
                 user.getPassword(), user.getUserId());
     }
+    public int updatePhone(Long userId, String phone) {
+
+    String sql = """
+        UPDATE USERS
+        SET phone = ?
+        WHERE user_id = ?
+    """;
+
+    return jdbcTemplate.update(sql, phone, userId);
+}
+public Optional<UserVO> findByUserId(Long userId) {
+    String sql = "SELECT * FROM USERS WHERE user_id = ?";
+
+    return jdbcTemplate.query(
+            sql,
+            new BeanPropertyRowMapper<>(UserVO.class),
+            userId
+    ).stream().findFirst();
+}
 }
