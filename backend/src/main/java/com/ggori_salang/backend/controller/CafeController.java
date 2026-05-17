@@ -30,7 +30,7 @@ public class CafeController {
     public ResponseEntity<List<CafeVO>> searchCafes(
             @RequestParam int regionId,
             @RequestParam(required = false) List<String> petTypes,
-            @RequestParam(required = false) Double maxWeight
+            @RequestParam(required = false) Integer maxWeight // 💡 Double에서 Integer로 변경하여 프론트엔드와 일치시킴
     ) {
         return ResponseEntity.ok(
                 cafeService.searchCafes(regionId, petTypes, maxWeight)

@@ -31,7 +31,7 @@ public class CafeService {
     public List<CafeVO> searchCafes(
             int regionId,
             List<String> petTypes,
-            Double maxWeight
+            Integer maxWeight
     ) {
         List<CafeVO> cafes = cafeDAO.findByFilters(regionId, petTypes, maxWeight);
         attachImages(cafes);
