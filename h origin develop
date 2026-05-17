@@ -1,0 +1,39 @@
+* [33m789ec25[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m)[m connect cafe region and image api
+*   [33mce09d09[m[33m ([m[1;31morigin/feature/cafe-api[m[33m, [m[1;31morigin/feature/MyPage2[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mfeature/cafe-api[m[33m)[m 2026.05.17 지역db연결완료
+[32m|[m[33m\[m  
+[32m|[m [33m|[m * [33m91529d9[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on feature/merge-src: 8a3e94e 2026.05.17 지역db연결완료
+[32m|[m [33m|[m[33m/[m[35m|[m 
+[32m|[m [33m|[m * [33mb086d07[m index on feature/merge-src: 8a3e94e 2026.05.17 지역db연결완료
+[32m|[m [33m|[m[33m/[m  
+[32m|[m * [33m8a3e94e[m[33m ([m[1;31morigin/feature/merge-src[m[33m, [m[1;32mfeature/merge-src[m[33m)[m 2026.05.17 지역db연결완료
+[32m|[m * [33me06165b[m backup before replacing project
+[32m|[m * [33maa0f3a1[m backup before overwrite
+[32m|[m * [33md113cc3[m merge teammate community pages
+[32m|[m[32m/[m  
+[32m|[m * [33m4a5c16f[m[33m ([m[1;32mfeature/region-api[m[33m)[m backup before teammate merge
+[32m|[m[32m/[m  
+*   [33m1b5a947[m[33m ([m[1;31morigin/update/login-signup[m[33m)[m 2026.05.15 로그인/회원가입, 커뮤니티 라우터 연결 완료
+[1;31m|[m[1;32m\[m  
+[1;31m|[m * [33mc93462c[m[33m ([m[1;31morigin/feature/main-integration[m[33m, [m[1;32mfeature/main-integration[m[33m)[m 2026.05.15 로그인/회원가입, 커뮤니티 라우터 연결 완료
+* [1;32m|[m   [33m9d90701[m Merge pull request #10 from ssr-human-project/feature/cafe
+[1;32m|[m[1;34m\[m [1;32m\[m  
+[1;32m|[m [1;34m|[m[1;32m/[m  
+[1;32m|[m[1;32m/[m[1;34m|[m   
+[1;32m|[m * [33m3ac0b62[m[33m ([m[1;31morigin/feature/cafe[m[33m)[m cafe 추가
+[1;32m|[m *   [33m6586732[m Merge branch 'feature/cafe' of https://github.com/ssr-human-project/human_ssr_project into feature/cafe
+[1;32m|[m [1;35m|[m[1;32m\[m  
+[1;32m|[m [1;35m|[m[1;32m/[m  
+[1;32m|[m[1;32m/[m[1;35m|[m   
+* [1;35m|[m   [33m9d544a5[m 2026.05.14 이지성 파일구조 수정
+[31m|[m[32m\[m [1;35m\[m  
+[31m|[m * [1;35m|[m [33med0c862[m[33m ([m[1;31morigin/refactor/project-structure[m[33m, [m[1;32mrefactor/project-structure[m[33m)[m 2026.05.14 이지성 파일구조 수정
+[31m|[m[31m/[m [1;35m/[m  
+* [1;35m|[m   [33mc331708[m 2026.05.14 백엔드, 디비 연결확인 및 수정
+[33m|[m[34m\[m [1;35m\[m  
+[33m|[m * [1;35m\[m   [33m06899c4[m[33m ([m[1;31morigin/feature/backend-fix[m[33m, [m[1;32mfeature/backend-fix[m[33m)[m 2026.05.14 백엔드, 디비 수정완료
+[33m|[m [35m|[m[33m\[m [1;35m\[m  
+[33m|[m [35m|[m[33m/[m [1;35m/[m  
+[33m|[m[33m/[m[35m|[m [1;35m|[m   
+* [35m|[m [1;35m|[m   [33ma167312[m 2026-05-14 임유리 / Signup 에 아이디,이름 삭제 이메일로 변경 / MyPage 추가/ FindAccountM…
+[1;31m|[m[1;32m\[m [35m\[m [1;35m\[m  
+[1;31m|[m * [35m|[m [1;35m|[m [33m75e725f[m[33m ([m[1;31morigin/feature/signup[m[33m)[m 2026-05-14 임유리 / Signup 에 아이디,이름 삭제 이메일로 변경 / MyPage 추가/ FindAccountModal 추가
