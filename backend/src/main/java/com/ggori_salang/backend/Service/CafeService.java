@@ -1,6 +1,5 @@
 package com.ggori_salang.backend.Service;
 
-
 import com.ggori_salang.backend.dao.CafeDAO;
 import com.ggori_salang.backend.vo.CafeVO;
 import lombok.RequiredArgsConstructor;
@@ -15,35 +14,36 @@ import java.util.Map;
 public class CafeService {
     private final CafeDAO cafeDAO;
 
-    public List<CafeVO> getCafesByRegion(int regionId) {
-    List<CafeVO> cafes = cafeDAO.findByRegion(regionId);
-
-    for (CafeVO cafe : cafes) {
-        cafe.setImageUrls(
-                cafeDAO.findImagesByCafeId(cafe.getCafeId())
-        );
+    private void attachImages(List<CafeVO> cafes) {
+        for (CafeVO cafe : cafes) {
+            cafe.setImageUrls(
+                    cafeDAO.findImagesByCafeId(cafe.getCafeId())
+            );
+        }
     }
 
-    return cafes;
-}
+    public List<CafeVO> getCafesByRegion(int regionId) {
+        List<CafeVO> cafes = cafeDAO.findByRegion(regionId);
+        attachImages(cafes);
+        return cafes;
+    }
 
     public List<CafeVO> searchCafes(
-        int regionId,
-        List<String> petTypes,
-        Double maxWeight
-) {
-    List<CafeVO> cafes =
-            cafeDAO.findByFilters(regionId, petTypes, maxWeight);
-
-    for (CafeVO cafe : cafes) {
-        cafe.setImageUrls(
-                cafeDAO.findImagesByCafeId(cafe.getCafeId())
-        );
+            int regionId,
+            List<String> petTypes,
+            Double maxWeight
+    ) {
+        List<CafeVO> cafes = cafeDAO.findByFilters(regionId, petTypes, maxWeight);
+        attachImages(cafes);
+        return cafes;
     }
 
-    return cafes;
-}
-    // 카페 상세: 카페 정보 + 이미지 목록
+    public List<CafeVO> searchCafesByKeyword(String keyword) {
+        List<CafeVO> cafes = cafeDAO.findByKeyword(keyword);
+        attachImages(cafes);
+        return cafes;
+    }
+
     public Map<String, Object> getCafeDetail(int cafeId) {
         CafeVO cafe = cafeDAO.findById(cafeId);
         List<String> images = cafeDAO.findImagesByCafeId(cafeId);
@@ -56,13 +56,15 @@ public class CafeService {
 
     public boolean createCafe(CafeVO cafe) {
         int result = cafeDAO.insertCafe(cafe);
-        // 이미지 URL 목록 저장
+
         if (result > 0 && cafe.getImageUrls() != null) {
             int cafeId = cafeDAO.getLastInsertedId();
+
             for (String url : cafe.getImageUrls()) {
                 cafeDAO.insertCafeImage(cafeId, url);
             }
         }
+
         return result > 0;
     }
 
@@ -74,21 +76,15 @@ public class CafeService {
         return cafeDAO.deleteCafe(cafeId) > 0;
     }
 
-    // 전체 카페 목록 (관리자용)
     public List<CafeVO> getAllCafes() {
-    List<CafeVO> cafes = cafeDAO.findAll();
-
-    for (CafeVO cafe : cafes) {
-        cafe.setImageUrls(
-                cafeDAO.findImagesByCafeId(cafe.getCafeId())
-        );
+        List<CafeVO> cafes = cafeDAO.findAll();
+        attachImages(cafes);
+        return cafes;
     }
 
-    return cafes;
-}
-
-    // 카페 단건 조회 (수정 폼용)
     public CafeVO getCafeById(int cafeId) {
-        return cafeDAO.findById(cafeId);
+        CafeVO cafe = cafeDAO.findById(cafeId);
+        cafe.setImageUrls(cafeDAO.findImagesByCafeId(cafeId));
+        return cafe;
     }
 }
