@@ -41,6 +41,7 @@ const MyPage = () => {
   const [petData, setPetData] = useState(emptyPetData);
   const [myPosts, setMyPosts] = useState([]);
   const [myReviews, setMyReviews] = useState([]);
+  const [myFavorites, setMyFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -101,6 +102,20 @@ const MyPage = () => {
         }
       } catch (error) {
         console.error("강아지 정보 조회 실패:", error);
+      }
+
+      try {
+        const favoriteResponse = await axios.get(
+          `${API_BASE_URL}/api/favorites/${userId}`,
+          { headers },
+        );
+
+        setMyFavorites(
+          Array.isArray(favoriteResponse.data) ? favoriteResponse.data : [],
+        );
+      } catch (error) {
+        console.error("찜목록 조회 실패:", error);
+        setMyFavorites([]);
       }
 
       try {
@@ -411,6 +426,51 @@ const MyPage = () => {
       )}
     </div>
   );
+  const renderFavorites = () => (
+    <div className="content-section">
+      <h3>찜한 카페</h3>
+
+      {myFavorites.length === 0 ? (
+        <div className="no-data">
+          <p>아직 찜한 카페가 없습니다.</p>
+        </div>
+      ) : (
+        <div className="wishlist-grid">
+          {myFavorites.map((cafe) => (
+            <div className="wish-card" key={cafe.cafeId}>
+              <div className="wish-img-wrapper">
+                <img
+                  src={
+                    cafe.imageUrl ||
+                    "https://via.placeholder.com/300x200?text=No+Image"
+                  }
+                  alt={cafe.cafeName}
+                />
+
+                <button className="heart-icon">❤️</button>
+              </div>
+
+              <div className="wish-info">
+                <h4>{cafe.cafeName}</h4>
+
+                <p className="location">📍 {cafe.address}</p>
+
+                <p className="rating">⭐ {cafe.rating ?? 0}</p>
+
+                <button
+                  type="button"
+                  className="detail-btn"
+                  onClick={() => navigate(`/cafes/${cafe.cafeId}`)}
+                >
+                  상세보기
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="mypage-container">
@@ -449,13 +509,7 @@ const MyPage = () => {
 
       <div className="main-content">
         {activeMenu === "profile" && renderProfile()}
-        {activeMenu === "wishlist" && (
-          <div className="content-section">
-            <div className="no-data">
-              <p>찜목록 기능은 추후 연결 예정입니다.</p>
-            </div>
-          </div>
-        )}
+        {activeMenu === "wishlist" && renderFavorites()}
         {activeMenu === "posts" && renderMyPosts()}
         {activeMenu === "reviews" && renderMyReviews()}
       </div>
