@@ -27,6 +27,19 @@ public class PostController {
     }
 
     /**
+     * 자유게시판 검색
+     * GET /api/posts/search?keyword=강남
+     *
+     * 주의:
+     * 이 메서드는 반드시 @GetMapping("/{postId}") 보다 위에 있어야 함.
+     * 그렇지 않으면 "search"를 postId로 인식해서 400 에러가 발생함.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<PostVO>> searchPosts(@RequestParam String keyword) {
+        return ResponseEntity.ok(postService.searchPosts(keyword));
+    }
+
+    /**
      * 자유게시판 상세 조회 (조회수 증가 포함)
      * GET /api/posts/{postId}
      */
@@ -48,6 +61,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<String> writePost(@RequestBody PostVO post) {
         boolean isSuccess = postService.writePost(post);
+
         return isSuccess
                 ? ResponseEntity.ok("게시글 작성 성공")
                 : ResponseEntity.badRequest().body("게시글 작성 실패");
@@ -58,13 +72,18 @@ public class PostController {
      * PUT /api/posts/{postId}
      */
     @PutMapping("/{postId}")
-    public ResponseEntity<String> updatePost(@PathVariable int postId,
-                                             @RequestBody PostVO post,
-                                             Authentication authentication) {
+    public ResponseEntity<String> updatePost(
+            @PathVariable int postId,
+            @RequestBody PostVO post,
+            Authentication authentication
+    ) {
         int userId = (int) authentication.getPrincipal();
+
         post.setPostId(postId);
         post.setUserId(userId);
+
         boolean isSuccess = postService.updatePost(post);
+
         return isSuccess
                 ? ResponseEntity.ok("게시글 수정 성공")
                 : ResponseEntity.badRequest().body("본인 게시글만 수정할 수 있습니다.");
@@ -74,12 +93,15 @@ public class PostController {
      * 자유게시판 글 삭제
      * DELETE /api/posts/{postId}
      */
-    // deletePost 수정
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable int postId,
-                                             Authentication authentication) {
+    public ResponseEntity<String> deletePost(
+            @PathVariable int postId,
+            Authentication authentication
+    ) {
         int userId = (int) authentication.getPrincipal();
+
         boolean isSuccess = postService.deletePost(postId, userId);
+
         return isSuccess
                 ? ResponseEntity.ok("게시글 삭제 성공")
                 : ResponseEntity.badRequest().body("본인 게시글만 삭제할 수 있습니다.");

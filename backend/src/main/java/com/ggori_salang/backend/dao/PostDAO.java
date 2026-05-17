@@ -74,4 +74,24 @@ public class PostDAO {
         return jdbcTemplate.queryForObject(
                 "SELECT SEQ_POST.CURRVAL FROM DUAL", Integer.class);
     }
+
+    public List<PostVO> searchPosts(String keyword) {
+    String sql = """
+        SELECT p.*, u.nickname
+        FROM POSTS p
+        JOIN USERS u ON p.user_id = u.user_id
+        WHERE LOWER(p.title) LIKE LOWER(?)
+           OR LOWER(p.content) LIKE LOWER(?)
+        ORDER BY p.created_at DESC
+    """;
+
+    String likeKeyword = "%" + keyword + "%";
+
+    return jdbcTemplate.query(
+            sql,
+            new BeanPropertyRowMapper<>(PostVO.class),
+            likeKeyword,
+            likeKeyword
+    );
+}
 }
