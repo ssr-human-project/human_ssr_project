@@ -11,16 +11,18 @@ const MainContent = styled.div` flex: 1; display: flex; flex-direction: column; 
 const SearchBar = styled.input` width: 100%; padding: 15px 20px; border: 1px solid #eee; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); outline: none; font-size: 1rem; margin-bottom: 10px; &:focus { border-color: #ff6b35; } `;
 
 const WideCard = styled.div` display: flex; background: white; border-radius: 16px; padding: 24px; border: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; &:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); } `;
-const TextContent = styled.div` flex: 1; `; // 패딩 조정
+const TextContent = styled.div` flex: 1; `;
 const CardHeader = styled.div` display: flex; align-items: center; gap: 10px; margin-bottom: 12px; `;
 const Tag = styled.span` color: #ff6b35; background: #fff3ef; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; `;
-const ViewCount = styled.span` color: #999; font-size: 0.85rem; `;
 const Title = styled.h3` margin: 0 0 10px 0; font-size: 1.2rem; font-weight: 700; color: #222; `;
 const Summary = styled.p` color: #666; font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; `;
 
 const PostList = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
+
+  // 1. 검색어 상태 추가
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -33,6 +35,13 @@ const PostList = () => {
     };
     fetchPosts();
   }, []);
+
+  // 2. 제목, 내용 필터링 로직 추가
+  const filteredPosts = posts.filter(post => {
+    const titleMatch = post.title ? post.title.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    const contentMatch = post.content ? post.content.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    return titleMatch || contentMatch;
+  });
 
   return (
     <Container>
@@ -48,26 +57,33 @@ const PostList = () => {
       </Sidebar>
 
       <MainContent>
-        <SearchBar placeholder="궁금한 내용을 검색해보세요!" />
-        {posts.map((post) => (
-          <WideCard key={post.postId} onClick={() => navigate(`/posts/${post.postId}`, { state: { post } })}>
-            <TextContent>
-              <CardHeader>
-                <Tag>자유게시판</Tag>
+        {/* 3. SearchBar 바인딩 */}
+        <SearchBar
+          placeholder="궁금한 내용을 검색해보세요!"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-              </CardHeader>
-              <Title>{post.title}</Title>
-              <Summary>
-                {/* ReviewList에서 사용한 방식: 태그 제거 후 텍스트만 추출 */}
-                {post.content ? post.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ') : ""}
-              </Summary>
-              <div style={{ fontSize: "0.85rem", color: "#999" }}>
-                {post.nickname} · {new Date(post.createdAt).toLocaleDateString()}
-              </div>
-            </TextContent>
-            {/* Thumbnail 섹션 삭제됨 */}
-          </WideCard>
-        ))}
+        {filteredPosts.length === 0 ? (
+          <div style={{textAlign: 'center', padding: '50px', color: '#999'}}>검색 결과가 없습니다.</div>
+        ) : (
+          filteredPosts.map((post) => (
+            <WideCard key={post.postId} onClick={() => navigate(`/posts/${post.postId}`, { state: { post } })}>
+              <TextContent>
+                <CardHeader>
+                  <Tag>자유게시판</Tag>
+                </CardHeader>
+                <Title>{post.title}</Title>
+                <Summary>
+                  {post.content ? post.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ') : ""}
+                </Summary>
+                <div style={{ fontSize: "0.85rem", color: "#999" }}>
+                  {post.nickname} · {new Date(post.createdAt).toLocaleDateString()}
+                </div>
+              </TextContent>
+            </WideCard>
+          ))
+        )}
       </MainContent>
     </Container>
   );

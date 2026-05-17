@@ -11,7 +11,7 @@ const MainContent = styled.div` flex: 1; display: flex; flex-direction: column; 
 const SearchBar = styled.input` width: 100%; padding: 15px 20px; border: 1px solid #eee; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); outline: none; font-size: 1rem; margin-bottom: 10px; &:focus { border-color: #ff6b35; } `;
 
 const WideCard = styled.div` display: flex; background: white; border-radius: 16px; padding: 24px; border: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; &:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); } `;
-const TextContent = styled.div` flex: 1; `; // 패딩 제거
+const TextContent = styled.div` flex: 1; `;
 const CardHeader = styled.div` display: flex; align-items: center; gap: 10px; margin-bottom: 12px; `;
 const Tag = styled.span` color: #ff6b35; background: #fff3ef; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; `;
 const Region = styled.span` color: #555; font-size: 0.9rem; font-weight: 500; `;
@@ -21,6 +21,9 @@ const Summary = styled.p` color: #666; font-size: 0.95rem; line-height: 1.6; mar
 const PetsitterList = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
+
+  // 1. 검색어 상태 추가
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -33,6 +36,14 @@ const PetsitterList = () => {
     };
     fetchPosts();
   }, []);
+
+  // 2. 동네(지역명), 제목, 내용 필터링 로직 추가
+  const filteredPosts = posts.filter(post => {
+    const regionMatch = post.region ? post.region.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    const titleMatch = post.title ? post.title.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    const contentMatch = post.content ? post.content.toLowerCase().includes(searchTerm.toLowerCase()) : false;
+    return regionMatch || titleMatch || contentMatch;
+  });
 
   return (
     <Container>
@@ -48,30 +59,37 @@ const PetsitterList = () => {
       </Sidebar>
 
       <MainContent>
-        <SearchBar placeholder="동네 이름을 검색해보세요 (예: 강남구, 천안...)" />
-        {posts.map((post) => (
-         <WideCard
-             key={post.postId}
-             // 상세 페이지로 이동할 때 'state'에 post 객체를 통째로 담아서 보냅니다.
-             onClick={() => navigate(`/petsitters/${post.postId}`, { state: { post } })}
-           >
-            <TextContent>
-              <CardHeader>
-                <Tag>펫시터 구인</Tag>
-                <Region>📍 {post.region}</Region>
-              </CardHeader>
-              <Title>{post.title}</Title>
-              <Summary>
-                {/* ReviewList에서 사용한 방식: 태그 제거 후 텍스트만 추출 */}
-                {post.content ? post.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ') : ""}
-              </Summary>
-              <div style={{ fontSize: "0.85rem", color: "#999" }}>
-                {post.nickname} · {new Date(post.createdAt).toLocaleDateString()}
-              </div>
-            </TextContent>
-            {/* Thumbnail 섹션 삭제됨 */}
-          </WideCard>
-        ))}
+        {/* 3. SearchBar 바인딩 */}
+        <SearchBar
+          placeholder="동네 이름을 검색해보세요 (예: 강남구, 천안...)"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        {filteredPosts.length === 0 ? (
+          <div style={{textAlign: 'center', padding: '50px', color: '#999'}}>검색 결과가 없습니다.</div>
+        ) : (
+          filteredPosts.map((post) => (
+           <WideCard
+               key={post.postId}
+               onClick={() => navigate(`/petsitters/${post.postId}`, { state: { post } })}
+             >
+              <TextContent>
+                <CardHeader>
+                  <Tag>펫시터 구인</Tag>
+                  <Region>📍 {post.region}</Region>
+                </CardHeader>
+                <Title>{post.title}</Title>
+                <Summary>
+                  {post.content ? post.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ') : ""}
+                </Summary>
+                <div style={{ fontSize: "0.85rem", color: "#999" }}>
+                  {post.nickname} · {new Date(post.createdAt).toLocaleDateString()}
+                </div>
+              </TextContent>
+            </WideCard>
+          ))
+        )}
       </MainContent>
     </Container>
   );
