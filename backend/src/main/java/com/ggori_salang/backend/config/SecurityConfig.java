@@ -76,6 +76,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 1. 모든 경로에 대한 OPTIONS 요청을 무조건 허용 (Preflight 해결)
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/favorites/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/cafes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cafes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cafes/all").permitAll() // 추가
@@ -91,6 +92,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll() // 댓글 조회 허용
                         .requestMatchers(HttpMethod.POST, "/api/comments/**").permitAll() // ⭐ 댓글 등록 허용 (로그인 체크를 JWT가 하도록)
                         .requestMatchers(HttpMethod.DELETE, "/api/comments/**").permitAll() // 댓글 삭제 허용
+
+
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )

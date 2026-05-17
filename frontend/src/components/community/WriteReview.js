@@ -52,11 +52,14 @@ const WriteReview = () => {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [rating, setRating] = useState("5.0");
+
+  // 변경 포인트 1: 초기값을 정수 문자열 "5"로 변경
+  const [rating, setRating] = useState("5");
   const [selectedCafe, setSelectedCafe] = useState("");
   const [cafes, setCafes] = useState([]);
 
-  const ratingOptions = Array.from({ length: 11 }, (_, i) => (i * 0.5).toFixed(1));
+  // 변경 포인트 2: 1점 단위(1점부터 5점까지) 배열 생성
+  const ratingOptions = Array.from({ length: 5 }, (_, i) => String(i + 1));
 
   // 1. 페이지 진입 시 로그인 체크 및 카페 목록 로드
   useEffect(() => {
@@ -80,7 +83,7 @@ const WriteReview = () => {
 
   const handleRegister = async () => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId"); // 로그인 시 저장한 실제 ID
+    const userId = localStorage.getItem("userId");
 
     // 2. 유효성 검사
     const pureContent = content.replace(/<[^>]*>?/gm, "").trim();
@@ -89,19 +92,17 @@ const WriteReview = () => {
       return;
     }
 
-    // 3. 로그인 기반 데이터 구성
+    // 3. 데이터 구성
     const reviewData = {
       cafeId: parseInt(selectedCafe),
-      userId: Number(userId), // 고정값 1 대신 실제 로그인 유저 ID 사용
+      userId: Number(userId),
       title: title,
       content: content,
-      rating: parseFloat(rating)
+      rating: parseFloat(rating) // 정수값이어도 안전하게 소수로 변환해서 전송 (예: 5 -> 5.0)
     };
 
     try {
       // 4. 인증 토큰을 포함하여 API 호출
-      // 만약 reviewApi 내부에 헤더 설정이 없다면 아래와 같이 직접 전송하거나
-      // reviewApi.writeReview 인자에 token을 추가로 전달해야 할 수 있습니다.
       const response = await axios.post("http://localhost:8111/api/reviews", reviewData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -142,14 +143,15 @@ const WriteReview = () => {
         ))}
       </select>
 
-      <Label>평점 선택 (0.5 단위) <span>*</span></Label>
+      {/* 변경 포인트 3: UI 텍스트 가독성 수정 */}
+      <Label>평점 선택 (1점 단위) <span>*</span></Label>
       <div style={{ display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px" }}>
         <RatingSelect value={rating} onChange={(e) => setRating(e.target.value)}>
           {ratingOptions.map((num) => (
             <option key={num} value={num}>{num}점</option>
           ))}
         </RatingSelect>
-        <span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#ff6b35" }}>{rating} / 5.0</span>
+        <span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#ff6b35" }}>{rating}.0 / 5.0</span>
       </div>
 
       <Label>제목 <span>*</span></Label>

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../api/axios";
 
 const FALLBACK_IMAGE =
@@ -28,9 +28,17 @@ function toTagArray(value) {
     .filter(Boolean);
 }
 
-export default function CafeListItem({ cafe }) {
+// 💡 변경 포인트 1: 부모(리스트 페이지)로부터 initialLiked 프롭스를 받도록 수정
+export default function CafeListItem({ cafe, initialLiked = false }) {
   const navigate = useNavigate();
-  const [wished, setWished] = useState(false);
+
+  // 💡 변경 포인트 2: initialLiked 값을 기준으로 wished 상태 정의
+  const [wished, setWished] = useState(initialLiked);
+
+  // 💡 변경 포인트 3: 검색 결과나 필터가 바뀌어 initialLiked가 변할 때 하트 상태도 동기화
+  useEffect(() => {
+    setWished(initialLiked);
+  }, [initialLiked]);
 
   const id = cafe.cafeId || cafe.id;
   const name = cafe.cafeName || cafe.title || "이름 없는 카페";
@@ -45,22 +53,37 @@ export default function CafeListItem({ cafe }) {
   const petTags = toTagArray(cafe.allowedPetTypes || cafe.facilities);
   const facilityTags = toTagArray(cafe.facilities);
 
+  // 💡 변경 포인트 4: 토글형(POST / DELETE 분기) 찜하기 로직으로 업그레이드
   const handleWish = async (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // 카드 클릭 이벤트가 실행되어 상세페이지로 넘어가는 현상 방지
 
     const token = localStorage.getItem("token");
+    const userId = Number(localStorage.getItem("userId"));
 
-    if (!token) {
+    if (!token || !userId) {
       alert("로그인이 필요한 서비스입니다.");
       navigate("/login");
       return;
     }
 
     try {
-      await api.post(`/favorites/${id}`);
-      setWished((prev) => !prev);
+      if (wished) {
+        // 이미 찜한 상태 ➡️ 찜 해제 (DELETE 요청)
+        // 백엔드 API 설계에 따라 주소를 확인해 보세요 (예: `/favorites/${userId}/${id}`)
+        await api.delete(`/favorites/${userId}/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setWished(false);
+      } else {
+        // 찜하지 않은 상태 ➡️ 찜 추가 (POST 요청)
+        await api.post(`/favorites`, { userId, cafeId: id }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setWished(true);
+      }
     } catch (err) {
-      console.error("찜하기 실패:", err);
+      console.error("찜하기 처리 실패:", err);
+      alert("즐겨찾기 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -259,7 +282,7 @@ export default function CafeListItem({ cafe }) {
                 fontWeight: 700,
               }}
             >
-              {cafe.maxWeight ? `-${cafe.maxWeight}kg` : "All"}
+              {cafe.maxWeight ? `${cafe.maxWeight}kg` : "All"}
             </span>
           </div>
 
