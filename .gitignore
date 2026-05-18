@@ -2,32 +2,55 @@
 # Frontend (React)
 # =========================
 
-frontend/node_modules
-frontend/build
-frontend/dist
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/coverage/
 
-# 환경변수
 frontend/.env
-
-# 로그파일
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
 # =========================
-# Backend (Spring Boot)
+# Backend (Spring Boot / Gradle)
 # =========================
 
-backend/.gradle
-backend/build
-backend/out
+backend/.gradle/
+backend/build/
+backend/out/
+backend/bin/
 
-# IntelliJ
-backend/.idea
-backend/*.iml
+.gradle/
+build/
+out/
+bin/
 
-# VSCode
-.vscode
+*.class
+
+# =========================
+# Node / Package
+# =========================
+
+.pnp/
+.pnp.js
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# IDE
+# =========================
+
+.idea/
+*.iml
+
+.vscode/
+
+*.swp
+*.swo
 
 # =========================
 # OS
@@ -41,21 +64,3 @@ Thumbs.db
 # =========================
 
 *.log
-
-# =========================
-# IDE
-# =========================
-
-.idea
-*.swp
-*.swo
-
-# =========================
-# Dependency locks (선택)
-# =========================
-
-# npm 사용 시 유지
-# yarn.lock 사용 시 유지
-
-# package-lock.json
-# yarn.lock

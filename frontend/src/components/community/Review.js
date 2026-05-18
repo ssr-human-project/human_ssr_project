@@ -1,0 +1,195 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import styled from 'styled-components';
+
+// --- 스타일 컴포넌트 (Petsitter.js 스타일 반영) ---
+const DetailContainer = styled.div`
+  max-width: 850px;
+  margin: 40px auto;
+  padding: 40px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: 'Pretendard', sans-serif;
+`;
+
+const StarContainer = styled.div`
+  display: flex;
+  color: #ffb800;
+  font-size: 1.2rem;
+  letter-spacing: -2px;
+`;
+
+const AdminButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+`;
+
+const ActionButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  &:hover { background: #f5f5f5; }
+  &.delete { color: #ff4d4d; border-color: #ff4d4d; }
+`;
+
+const Review = () => {
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [review, setReview] = useState(location.state?.review || null);
+  // 💡 [추가] 카페의 첫 번째 이미지를 저장할 상태
+  const [cafeFirstImg, setCafeFirstImg] = useState('');
+
+  const currentUserId = Number(localStorage.getItem("userId"));
+  const token = localStorage.getItem("token");
+
+  // 1. 리뷰 상세 정보 로드
+  useEffect(() => {
+    if (!review) {
+      const fetchDetail = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8111/api/reviews/${id}`);
+          setReview(response.data);
+        } catch (error) {
+          console.error("리뷰 상세 정보 로딩 실패:", error);
+        }
+      };
+      fetchDetail();
+    }
+  }, [id, review]);
+
+  // 2. 💡 [추가] 리뷰 데이터가 있고, 자체 리뷰 사진이 없을 경우 카페 이미지 가져오기
+  useEffect(() => {
+    if (review && (!review.imageUrls || review.imageUrls.length === 0)) {
+      const fetchCafeImage = async () => {
+        try {
+          // Cafedetail.js의 호출 방식을 참고하여 해당 카페 정보 요청
+          const response = await axios.get(`http://localhost:8111/api/cafes/${review.cafeId}`);
+          const cafeData = response.data.cafe || response.data;
+
+          // 카페 이미지 배열이나 단일 이미지 주소 추출
+          if (cafeData.imageUrls && cafeData.imageUrls.length > 0) {
+            setCafeFirstImg(cafeData.imageUrls[0]);
+          } else if (cafeData.image || cafeData.cafeThumbnail) {
+            setCafeFirstImg(cafeData.image || cafeData.cafeThumbnail);
+          }
+        } catch (error) {
+          console.error("카페 정보 로딩 실패 (이미지 대체용):", error);
+        }
+      };
+
+      // review 객체에 cafeId가 존재할 때만 실행
+      if (review.cafeId) {
+        fetchCafeImage();
+      }
+    }
+  }, [review]);
+
+  const handleDelete = async () => {
+    if (!window.confirm("정말로 이 리뷰를 삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`http://localhost:8111/api/reviews/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("삭제되었습니다.");
+      navigate('/reviews');
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert("삭제 권한이 없거나 오류가 발생했습니다.");
+    }
+  };
+
+  const handleEdit = () => {
+    navigate(`/edit-review/${id}`, { state: { review } });
+  };
+
+  if (!review) return <div style={{ padding: '100px', textAlign: 'center' }}>로딩 중...</div>;
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) stars.push(<span key={i}>★</span>);
+      else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push(
+          <span key={i} style={{ position: 'relative', display: 'inline-block', width: '1em', overflow: 'hidden' }}>
+            <span style={{ position: 'absolute', color: '#eee' }}>★</span>
+            <span style={{ position: 'absolute', width: '50%', overflow: 'hidden', color: '#ffb800' }}>★</span>
+          </span>
+        );
+      } else stars.push(<span key={i} style={{ color: '#eee' }}>★</span>);
+    }
+    return stars;
+  };
+
+  // 💡 [수정] 이미지 소스 우선순위 결정 로직
+  // 1순위: 리뷰 자체 사진 -> 2순위: 불러온 카페 첫 이미지 -> 3순위: 대체 기본 이미지(Placeholder)
+  const displayImageUrl = (review.imageUrls && review.imageUrls.length > 0)
+    ? review.imageUrls[0]
+    : (cafeFirstImg || 'https://via.placeholder.com/800x450?text=No+Image');
+
+  return (
+    <DetailContainer>
+      {/* 작성자 본인일 때만 수정/삭제 버튼 표시 */}
+      {currentUserId === review.userId && (
+        <AdminButtonGroup>
+          <ActionButton onClick={handleEdit}>수정</ActionButton>
+          <ActionButton className="delete" onClick={handleDelete}>삭제</ActionButton>
+        </AdminButtonGroup>
+      )}
+
+      {/* 이미지 섹션 */}
+      <div style={{ width: '100%', height: '450px', marginBottom: '30px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+        <img
+          src={displayImageUrl}
+          alt="카페 리뷰 사진"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      </div>
+
+      {/* 헤더 섹션 */}
+      <div style={{ marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+          <span style={{ color: '#ff6b35', fontWeight: 'bold', background: '#fff3ef', padding: '4px 12px', borderRadius: '8px' }}>
+            📍 {review.cafeName || '정보 없음'}
+          </span>
+          <StarContainer>{renderStars(review.rating)}</StarContainer>
+          <span style={{ color: '#ff6b35', fontWeight: 'bold' }}>{review.rating?.toFixed(1)}</span>
+        </div>
+        <h2 style={{ fontSize: '2.2rem', fontWeight: '800', margin: '15px 0 20px 0', color: '#222' }}>{review.title}</h2>
+      </div>
+
+      {/* 정보 섹션 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f0f0f0', paddingBottom: '20px', marginBottom: '30px', color: '#888' }}>
+        <div style={{ display: 'flex', gap: '15px' }}>
+          <span>👤 {review.nickname}</span>
+          <span>📅 {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : '날짜 정보 없음'}</span>
+        </div>
+      </div>
+
+      {/* 본문 내용 */}
+      <div
+        style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#444', minHeight: '300px' }}
+        dangerouslySetInnerHTML={{ __html: review.content }}
+      />
+
+      <button
+        onClick={() => navigate('/reviews')}
+        style={{ marginTop: '50px', padding: '12px 30px', background: '#f5f5f5', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', color: '#666' }}
+      >
+        목록으로 돌아가기
+      </button>
+    </DetailContainer>
+  );
+};
+
+export default Review;
