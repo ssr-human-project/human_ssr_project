@@ -1,5 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import React from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import React, { useEffect } from "react";
 
 // 공통 컴포넌트
 import Header from "./components/layout/Header";
@@ -39,10 +45,26 @@ import "./styles/section/PopularRegions.css";
 import "./styles/section/CommunitySection.css";
 import "./styles/layout/Footer.css";
 
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
+  }, [pathname, search]);
+
+  return null;
+}
+
 function App() {
   return (
     // 💡 AuthProvider 차단막을 모두 제거하고 브라우저 라우터가 최상단으로 오도록 수정했습니다.
     <BrowserRouter>
+      <ScrollToTop />
+
       <div>
         <Header />
 

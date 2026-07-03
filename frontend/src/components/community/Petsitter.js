@@ -40,7 +40,6 @@ const Petsitter = () => {
 
   const currentUserId = Number(localStorage.getItem("userId"));
   const nickname = localStorage.getItem("nickname");
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,9 +64,7 @@ const Petsitter = () => {
     if (!window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`http://localhost:8111/api/pet-sitter/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`http://localhost:8111/api/pet-sitter/${id}`);
       alert("삭제되었습니다.");
       navigate('/petsitters');
     } catch (error) {
@@ -82,13 +79,10 @@ const Petsitter = () => {
 
   // --- 댓글 등록 핸들러 추가 ---
   const handleCommentSubmit = async () => {
-    const rawToken = localStorage.getItem("token");
-    if (!rawToken) {
+    if (!currentUserId) {
       alert("로그인이 필요한 서비스입니다.");
       return;
     }
-
-    const formattedToken = rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`;
 
     if (!newComment.trim()) {
       alert("내용을 입력해주세요.");
@@ -105,7 +99,6 @@ const Petsitter = () => {
       // 백엔드 요청: POST /api/pet-sitter/{id}/comments
       const response = await axios.post(`http://localhost:8111/api/pet-sitter/${id}/comments`, commentData, {
         headers: {
-          Authorization: formattedToken,
           "Content-Type": "application/json"
         }
       });
@@ -133,13 +126,8 @@ const Petsitter = () => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
 
     try {
-      const rawToken = localStorage.getItem("token");
-      const formattedToken = rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`;
-
       // 백엔드 경로: DELETE /api/pet-sitter/{postId}/comments/{commentId}
-      await axios.delete(`http://localhost:8111/api/pet-sitter/${id}/comments/${commentId}`, {
-        headers: { Authorization: formattedToken }
-      });
+      await axios.delete(`http://localhost:8111/api/pet-sitter/${id}/comments/${commentId}`);
 
       alert("댓글이 삭제되었습니다.");
       // 프론트 UI 상태 업데이트

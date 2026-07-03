@@ -49,7 +49,6 @@ const Review = () => {
   const [cafeFirstImg, setCafeFirstImg] = useState('');
 
   const currentUserId = Number(localStorage.getItem("userId"));
-  const token = localStorage.getItem("token");
 
   // 1. 리뷰 상세 정보 로드
   useEffect(() => {
@@ -96,9 +95,7 @@ const Review = () => {
   const handleDelete = async () => {
     if (!window.confirm("정말로 이 리뷰를 삭제하시겠습니까?")) return;
     try {
-      await axios.delete(`http://localhost:8111/api/reviews/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`http://localhost:8111/api/reviews/${id}`);
       alert("삭제되었습니다.");
       navigate('/reviews');
     } catch (error) {

@@ -47,7 +47,11 @@ public class PetSitterPostController {
      * }
      */
     @PostMapping
-    public ResponseEntity<String> write(@RequestBody PetSitterPostVO post) {
+    public ResponseEntity<String> write(@RequestBody PetSitterPostVO post,
+                                        Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        post.setUserId(userId);
+
         boolean isSuccess = petSitterService.writeSitterPost(post);
         return isSuccess
                 ? ResponseEntity.ok("게시글 작성 성공")

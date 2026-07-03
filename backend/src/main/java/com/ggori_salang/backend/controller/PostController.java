@@ -59,7 +59,11 @@ public class PostController {
      * }
      */
     @PostMapping
-    public ResponseEntity<String> writePost(@RequestBody PostVO post) {
+    public ResponseEntity<String> writePost(@RequestBody PostVO post,
+                                            Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        post.setUserId(userId);
+
         boolean isSuccess = postService.writePost(post);
 
         return isSuccess

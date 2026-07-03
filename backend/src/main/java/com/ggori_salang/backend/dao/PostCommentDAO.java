@@ -28,8 +28,8 @@ public class PostCommentDAO {
     }
 
     public int insert(PostCommentVO comment) {
-        String sql = "INSERT INTO POST_COMMENTS (comment_id, post_id, user_id, content) " +
-                "VALUES (SEQ_POST_COMMENT.NEXTVAL, ?, ?, ?)";
+        String sql = "INSERT INTO POST_COMMENTS (post_id, user_id, content) " +
+                "VALUES (?, ?, ?)";
         return jdbcTemplate.update(sql,
                 comment.getPostId(), comment.getUserId(), comment.getContent());
     }

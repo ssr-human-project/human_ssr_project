@@ -42,15 +42,15 @@ public class PostDAO {
     }
 
     public int insert(PostVO post) {
-        String sql = "INSERT INTO POSTS (post_id, user_id, title, content) " +
-                "VALUES (SEQ_POST.NEXTVAL, ?, ?, ?)";
+        String sql = "INSERT INTO POSTS (user_id, title, content) " +
+                "VALUES (?, ?, ?)";
         return jdbcTemplate.update(sql,
                 post.getUserId(), post.getTitle(), post.getContent());
     }
 
     public int insertImage(int postId, String imageUrl) {
-        String sql = "INSERT INTO POST_IMAGES (image_id, post_id, image_url) " +
-                "VALUES (SEQ_POST_IMAGE.NEXTVAL, ?, ?)";
+        String sql = "INSERT INTO POST_IMAGES (post_id, image_url) " +
+                "VALUES (?, ?)";
         return jdbcTemplate.update(sql, postId, imageUrl);
     }
 
@@ -72,7 +72,7 @@ public class PostDAO {
     // 가장 최근에 삽입된 post_id 가져오기 (이미지 INSERT 시 필요)
     public int getLastInsertedId() {
         return jdbcTemplate.queryForObject(
-                "SELECT SEQ_POST.CURRVAL FROM DUAL", Integer.class);
+                "SELECT LAST_INSERT_ID()", Integer.class);
     }
 
     public List<PostVO> searchPosts(String keyword) {

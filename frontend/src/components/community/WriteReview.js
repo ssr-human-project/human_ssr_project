@@ -63,8 +63,8 @@ const WriteReview = () => {
 
   // 1. 페이지 진입 시 로그인 체크 및 카페 목록 로드
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
       alert("로그인이 필요한 서비스입니다.");
       navigate("/login");
       return;
@@ -82,7 +82,6 @@ const WriteReview = () => {
   }, [navigate]);
 
   const handleRegister = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
     // 2. 유효성 검사
@@ -102,10 +101,8 @@ const WriteReview = () => {
     };
 
     try {
-      // 4. 인증 토큰을 포함하여 API 호출
       const response = await axios.post("http://localhost:8111/api/reviews", reviewData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });

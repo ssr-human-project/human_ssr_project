@@ -14,8 +14,8 @@ public class UserDAO {
     private final JdbcTemplate jdbcTemplate;
 
     public int insertUser(UserVO user) {
-        String sql = "INSERT INTO USERS (user_id, email, password, nickname, phone, role) " +
-                "VALUES (SEQ_USER.NEXTVAL, ?, ?, ?, ?, 'USER')";
+        String sql = "INSERT INTO USERS (email, password, nickname, phone, role) " +
+                "VALUES (?, ?, ?, ?, 'USER')";
         return jdbcTemplate.update(sql,
                 user.getEmail(), user.getPassword(),
                 user.getNickname(), user.getPhone());

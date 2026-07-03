@@ -126,14 +126,11 @@ export default function SearchResults() {
 
   useEffect(() => {
     const userId = Number(localStorage.getItem("userId"));
-    const token = localStorage.getItem("token");
 
-    if (!userId || !token) return;
+    if (!userId) return;
 
     axios
-      .get(`http://localhost:8111/api/favorites/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get(`http://localhost:8111/api/favorites/${userId}`)
       .then((res) => {
         const ids = res.data.map((f) => f.cafeId);
         setFavoriteIds(ids);

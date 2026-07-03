@@ -88,9 +88,9 @@ public class CafeDAO {
     }
 
     public int insertCafe(CafeVO cafe) {
-        String sql = "INSERT INTO CAFES (cafe_id, region_id, cafe_name, address, phone, description, " +
+        String sql = "INSERT INTO CAFES (region_id, cafe_name, address, phone, description, " +
                 "allowed_pet_types, max_weight, latitude, longitude, naver_map_url) " +
-                "VALUES (SEQ_CAFE.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         return jdbcTemplate.update(
                 sql,
@@ -108,8 +108,8 @@ public class CafeDAO {
     }
 
     public int insertCafeImage(int cafeId, String imageUrl) {
-        String sql = "INSERT INTO CAFE_IMAGES (image_id, cafe_id, image_url) " +
-                "VALUES (SEQ_CAFE_IMAGE.NEXTVAL, ?, ?)";
+        String sql = "INSERT INTO CAFE_IMAGES (cafe_id, image_url) " +
+                "VALUES (?, ?)";
 
         return jdbcTemplate.update(sql, cafeId, imageUrl);
     }
@@ -145,7 +145,7 @@ public class CafeDAO {
 
     public int getLastInsertedId() {
         return jdbcTemplate.queryForObject(
-                "SELECT SEQ_CAFE.CURRVAL FROM DUAL",
+                "SELECT LAST_INSERT_ID()",
                 Integer.class
         );
     }

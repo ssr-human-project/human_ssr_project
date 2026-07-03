@@ -35,7 +35,6 @@ const Post = () => {
   // 💡 현재 브라우저에 저장되는 로컬스토리지 방식 그대로 동기화 완료!
   const currentUserId = localStorage.getItem("userId") ? Number(localStorage.getItem("userId")) : null;
   const nickname = localStorage.getItem("nickname");
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,9 +55,7 @@ const Post = () => {
   const handleDeletePost = async () => {
     if (!window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
     try {
-      await axios.delete(`http://localhost:8111/api/posts/${id}`, {
-        headers: { Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}` }
-      });
+      await axios.delete(`http://localhost:8111/api/posts/${id}`);
       alert("삭제되었습니다.");
       navigate('/boards');
     } catch (error) {
@@ -67,8 +64,7 @@ const Post = () => {
   };
 
   const handleCommentSubmit = async () => {
-    // 💡 브라우저에 깔려있는 토큰 정보를 기준으로 실시간 검증
-    if (!token || !currentUserId) {
+    if (!currentUserId) {
       alert("로그인이 필요한 서비스입니다.");
       return;
     }
@@ -76,9 +72,6 @@ const Post = () => {
       alert("내용을 입력해주세요.");
       return;
     }
-
-    // 토큰 규격 포맷팅 (Bearer 자동 조율)
-    const formattedToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
 
     try {
       // 오라클 DB 구조 및 컨트롤러 DTO 스펙 명밀 매핑 완료
@@ -89,10 +82,7 @@ const Post = () => {
       };
 
       const response = await axios.post(`http://localhost:8111/api/comments`, commentData, {
-        headers: {
-          Authorization: formattedToken,
-          "Content-Type": "application/json"
-        }
+        headers: { "Content-Type": "application/json" }
       });
 
       if (response.data) {
@@ -109,10 +99,7 @@ const Post = () => {
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
     try {
-      const formattedToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-      await axios.delete(`http://localhost:8111/api/comments/${commentId}`, {
-        headers: { Authorization: formattedToken }
-      });
+      await axios.delete(`http://localhost:8111/api/comments/${commentId}`);
       alert("댓글이 삭제되었습니다.");
       setComments(prev => prev.filter(comment => comment.commentId !== commentId));
     } catch (error) {

@@ -17,7 +17,7 @@ public class FavoriteDAO {
     public List<FavoriteVO> findByUserId(int userId) {
         String sql = "SELECT f.favorite_id, f.user_id, f.cafe_id, f.created_at, " +
                 "c.cafe_name, c.address, c.rating, " +
-                "(SELECT image_url FROM CAFE_IMAGES WHERE cafe_id = c.cafe_id AND ROWNUM = 1) AS image_url " +
+                "(SELECT image_url FROM CAFE_IMAGES WHERE cafe_id = c.cafe_id LIMIT 1) AS image_url " +
                 "FROM FAVORITES f JOIN CAFES c ON f.cafe_id = c.cafe_id " +
                 "WHERE f.user_id = ? ORDER BY f.created_at DESC";
         return jdbcTemplate.query(sql,
@@ -25,8 +25,8 @@ public class FavoriteDAO {
     }
 
     public int insert(int userId, int cafeId) {
-        String sql = "INSERT INTO FAVORITES (favorite_id, user_id, cafe_id) " +
-                "VALUES (SEQ_FAVORITE.NEXTVAL, ?, ?)";
+        String sql = "INSERT INTO FAVORITES (user_id, cafe_id) " +
+                "VALUES (?, ?)";
         return jdbcTemplate.update(sql, userId, cafeId);
     }
 

@@ -13,7 +13,6 @@ import {
 import "../../styles/cafes/Cafedetail.css";
 
 const BASE_URL = "http://localhost:8111";
-const getToken = () => localStorage.getItem("token");
 const getUserId = () => Number(localStorage.getItem("userId"));
 
 export default function CafeDetail() {
@@ -46,11 +45,9 @@ export default function CafeDetail() {
       ];
 
       // 💡 [수정] 로그인한 유저인 경우에만 찜 목록 요청 추가 (Promise.all 구조 최적화)
-      if (userId && getToken()) {
+      if (userId) {
         requests.push(
-          axios.get(`${BASE_URL}/api/favorites/${userId}`, {
-            headers: { Authorization: `Bearer ${getToken()}` },
-          })
+          axios.get(`${BASE_URL}/api/favorites/${userId}`)
         );
       }
 
@@ -128,9 +125,8 @@ export default function CafeDetail() {
   // 💡 [수정] 하트 클릭 시 호출될 찜하기 토글 핸들러 함수
   const handleWishToggle = async () => {
     const userId = getUserId();
-    const token = getToken();
 
-    if (!userId || !token) {
+    if (!userId) {
       alert("로그인이 필요한 서비스입니다.");
       navigate("/login");
       return;
@@ -141,16 +137,13 @@ export default function CafeDetail() {
     try {
       if (wished) {
         // 이미 찜한 상태 ➡️ 해제 (DELETE)
-        await axios.delete(`${BASE_URL}/api/favorites/${userId}/${currentCafeId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.delete(`${BASE_URL}/api/favorites/${userId}/${currentCafeId}`);
         setWished(false);
       } else {
         // 찜하지 않은 상태 ➡️ 추가 (POST)
         await axios.post(
           `${BASE_URL}/api/favorites`,
-          { userId, cafeId: currentCafeId },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { userId, cafeId: currentCafeId }
         );
         setWished(true);
       }

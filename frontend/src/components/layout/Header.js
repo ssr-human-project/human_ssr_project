@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/layout/Header.css";
+import apiClient from "../../api/axiosApi";
 
 function Header() {
   const navigate = useNavigate();
@@ -11,9 +12,9 @@ function Header() {
   const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
 
-    if (token) {
+    if (userId) {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
@@ -33,9 +34,14 @@ function Header() {
   };
 
   // 로그아웃
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm("로그아웃 하시겠습니까?")) {
-      localStorage.removeItem("token");
+      try {
+        await apiClient.post("/api/auth/logout");
+      } catch (error) {
+        console.error("로그아웃 요청 실패:", error);
+      }
+
       localStorage.removeItem("userId");
       localStorage.removeItem("nickname");
       localStorage.removeItem("role");

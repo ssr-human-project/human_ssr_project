@@ -31,7 +31,6 @@ public class PetDAO {
     public int insertPet(PetVO pet) {
         String sql = """
             INSERT INTO USER_PETS (
-                pet_id,
                 user_id,
                 pet_name,
                 pet_type,
@@ -40,7 +39,6 @@ public class PetDAO {
                 weight,
                 description
             ) VALUES (
-                SEQ_USER_PET.NEXTVAL,
                 ?, ?, ?, ?, ?, ?, ?
             )
         """;
@@ -116,7 +114,6 @@ public class PetDAO {
     public void insertPet(Long userId, PetSaveReq req) {
         String sql = """
             INSERT INTO USER_PETS (
-                pet_id,
                 user_id,
                 pet_name,
                 pet_type,
@@ -125,7 +122,6 @@ public class PetDAO {
                 weight,
                 description
             ) VALUES (
-                SEQ_USER_PET.NEXTVAL,
                 ?, ?, ?, ?, ?, ?, ?
             )
         """;

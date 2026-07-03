@@ -47,15 +47,14 @@ const WritePost = () => {
 
   // 페이지 진입 시 로그인 체크
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
       alert("로그인이 필요한 서비스입니다.");
       navigate("/login");
     }
   }, [navigate]);
 
   const handleRegister = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
     // 1. 유효성 검사 (빈 값 체크)
@@ -77,8 +76,7 @@ const WritePost = () => {
       // 3. 백엔드 API 호출
       const response = await axios.post('http://localhost:8111/api/posts', postData, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 로그인 유지용 토큰
+          'Content-Type': 'application/json'
         }
       });
 

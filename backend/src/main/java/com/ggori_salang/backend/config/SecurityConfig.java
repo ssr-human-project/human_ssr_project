@@ -1,8 +1,6 @@
 package com.ggori_salang.backend.config;
 
 import com.ggori_salang.backend.Service.CustomUserDetailService;
-import com.ggori_salang.backend.jwt.JwtAuthFilter;
-import com.ggori_salang.backend.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailService customUserDetailService;
 
     // =============================================
@@ -62,7 +58,7 @@ public class SecurityConfig {
     }
 
     // =============================================
-    // 2. 일반 사용자 API - JWT 방식 (@Order(2) 나중에 적용)
+    // 2. 일반 사용자 API - 세션 방식 (@Order(2) 나중에 적용)
     // =============================================
     @Bean
     @Order(2)
@@ -70,7 +66,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
@@ -83,23 +79,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/regions/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pet-sitter/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/reviews").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reviews").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/**").permitAll()
                         .requestMatchers(HttpMethod.POST,   "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/cafes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll() // 댓글 조회 허용
-                        .requestMatchers(HttpMethod.POST, "/api/comments/**").permitAll() // ⭐ 댓글 등록 허용 (로그인 체크를 JWT가 하도록)
-                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**").permitAll() // 댓글 삭제 허용
+                        .requestMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**").authenticated()
 
 
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
-                )
-                .addFilterBefore(
-                        new JwtAuthFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class
                 );
 
         return http.build();

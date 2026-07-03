@@ -2,7 +2,6 @@ package com.ggori_salang.backend.Service;
 
 
 import com.ggori_salang.backend.dao.UserDAO;
-import com.ggori_salang.backend.jwt.JwtTokenProvider;
 import com.ggori_salang.backend.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +15,6 @@ import java.util.Map;
 public class AuthService {
     private final UserDAO userDAO;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
 
     public boolean signup(UserVO user) {
         if (userDAO.existsByEmail(user.getEmail())) return false;
@@ -24,20 +22,29 @@ public class AuthService {
         return userDAO.insertUser(user) > 0;
     }
 
-    // 로그인 성공 시 JWT 토큰 + role 반환
     public Map<String, String> login(String email, String password) {
         return userDAO.findByEmail(email)
-                .filter(u -> passwordEncoder.matches(password, u.getPassword()))
-                .map(u -> {
-                    String token = jwtTokenProvider.generateToken(u.getUserId(), u.getRole());
+                .map(user -> {
+                    if (!passwordEncoder.matches(password, user.getPassword())) {
+                        Map<String, String> result = new HashMap<>();
+                        result.put("errorCode", "PASSWORD_MISMATCH");
+                        result.put("message", "비밀번호가 틀렸습니다.");
+                        return result;
+                    }
+
                     Map<String, String> result = new HashMap<>();
-                    result.put("token", token);
-                    result.put("role", u.getRole());
-                    result.put("nickname", u.getNickname());
-                    result.put("userId", String.valueOf(u.getUserId()));
+                    result.put("role", user.getRole() == null ? "USER" : user.getRole());
+                    result.put("nickname", user.getNickname());
+                    result.put("userId", String.valueOf(user.getUserId()));
+                    result.put("email", user.getEmail());
                     return result;
                 })
-                .orElse(null);
+                .orElseGet(() -> {
+                    Map<String, String> result = new HashMap<>();
+                    result.put("errorCode", "EMAIL_NOT_FOUND");
+                    result.put("message", "아이디를 확인해주세요.");
+                    return result;
+                });
     }
 
     public boolean isEmailDuplicated(String email) {

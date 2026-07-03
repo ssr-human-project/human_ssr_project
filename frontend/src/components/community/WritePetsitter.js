@@ -58,15 +58,14 @@ const WritePetsitter = () => {
 
   // 1. 페이지 진입 시 로그인 체크
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
       alert("로그인이 필요한 서비스입니다.");
       navigate("/login");
     }
   }, [navigate]);
 
   const handleRegister = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId"); // 저장된 실제 유저 ID 가져오기
 
     // 유효성 검사
@@ -86,11 +85,9 @@ const WritePetsitter = () => {
     };
 
     try {
-      // 3. Authorization 헤더에 토큰 포함하여 전송
       const response = await axios.post('http://localhost:8111/api/pet-sitter', postData, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 토큰 인증 추가
+          'Content-Type': 'application/json'
         }
       });
 

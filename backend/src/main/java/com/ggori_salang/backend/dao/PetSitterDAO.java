@@ -42,16 +42,16 @@ public class PetSitterDAO {
     }
 
     public int insert(PetSitterPostVO post) {
-        String sql = "INSERT INTO PET_SITTER_POSTS (post_id, user_id, title, content, region) " +
-                "VALUES (SEQ_PETSITTER_POST.NEXTVAL, ?, ?, ?, ?)";
+        String sql = "INSERT INTO PET_SITTER_POSTS (user_id, title, content, region) " +
+                "VALUES (?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 post.getUserId(), post.getTitle(),
                 post.getContent(), post.getRegion());
     }
 
     public int insertImage(int postId, String imageUrl) {
-        String sql = "INSERT INTO PETSITTER_IMAGES (image_id, post_id, image_url) " +
-                "VALUES (SEQ_PETSITTER_IMAGE.NEXTVAL, ?, ?)";
+        String sql = "INSERT INTO PETSITTER_IMAGES (post_id, image_url) " +
+                "VALUES (?, ?)";
         return jdbcTemplate.update(sql, postId, imageUrl);
     }
 
@@ -74,6 +74,6 @@ public class PetSitterDAO {
 
     public int getLastInsertedId() {
         return jdbcTemplate.queryForObject(
-                "SELECT SEQ_PETSITTER_POST.CURRVAL FROM DUAL", Integer.class);
+                "SELECT LAST_INSERT_ID()", Integer.class);
     }
 }

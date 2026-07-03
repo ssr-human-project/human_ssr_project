@@ -5,45 +5,81 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api/axiosApi";
 
 const Login = () => {
-  // 입력값 state
-  const [user_id, setUser_id] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFindModalOpen, setFindModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-    }
+    let mounted = true;
+
+    const checkSession = async () => {
+      try {
+        const data = await api.auth.me({ skipAuthRedirect: true });
+        if (!mounted || !data?.userId) return;
+
+        localStorage.setItem("userId", data.userId);
+        localStorage.setItem("role", data.role ?? "USER");
+        navigate("/", { replace: true });
+      } catch {
+        ["userId", "nickname", "role"].forEach((key) =>
+          localStorage.removeItem(key),
+        );
+      }
+    };
+
+    checkSession();
+
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setMessage("");
+
+    if (!email.trim() || !password) {
+      setMessage("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
-      const data = await api.auth.login(user_id, password);
+      const data = await api.auth.login(email.trim(), password);
 
-      if (!data?.token) {
-        alert("로그인 응답에 토큰이 없습니다. 백엔드 응답값을 확인해주세요.");
+      if (!data?.userId) {
+        setMessage("로그인 응답에 사용자 정보가 없습니다.");
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "userId",
-        data.userId ?? data.memberId ?? data.id ?? "",
-      );
+      localStorage.setItem("userId", data.userId);
       localStorage.setItem("nickname", data.nickname ?? data.name ?? "회원");
       localStorage.setItem("role", data.role ?? "USER");
 
       window.dispatchEvent(new Event("loginStatusChanged"));
-
-      alert(`${data.nickname ?? "회원"}님 환영합니다!`);
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("로그인 실패:", error);
-      alert("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.");
+
+      const errorCode = error.response?.data?.errorCode;
+
+      if (errorCode === "EMAIL_NOT_FOUND") {
+        alert("아이디를 확인해주세요.");
+        return;
+      }
+
+      if (errorCode === "PASSWORD_MISMATCH") {
+        alert("비밀번호가 틀렸습니다.");
+        return;
+      }
+
+      alert("로그인에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -51,107 +87,63 @@ const Login = () => {
     <div className="auth-wrapper">
       <div className="auth-inner">
         <div className="logo-area">
-          <div className="temp-logo-icon">🐾</div>
-          <span className="logo-text">꼬리살랑</span>
+          <div className="temp-logo-icon" aria-hidden="true">
+            🐾
+          </div>
+          <span className="logo-text">꼬리사랑</span>
         </div>
-        <p className="auth-desc">반가워요! 다시 만나서 기뻐요.</p>
+        <p className="auth-desc">반려견과 함께하는 일상을 더 편하게</p>
+        <p className="sub-title">계정에 로그인하고 서비스를 이용해보세요.</p>
 
-        <p className="sub-title">반려견과 함께하는 특별한 시간</p>
-
-        <form className="auth-form" onSubmit={handleLogin}>
+        <form className="auth-form" onSubmit={handleLogin} noValidate>
           <h2>로그인</h2>
 
           <div className="input-group">
-            <label>아이디</label>
-
+            <label htmlFor="login-email">이메일</label>
             <input
-              type="text"
-              placeholder="아이디를 입력하세요"
-              value={user_id}
-              onChange={(e) => setUser_id(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
-            <label>비밀번호</label>
-            <input
-              type="password"
-              placeholder="비밀번호를 입력하세요"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="login-email"
+              type="email"
+              placeholder="email@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
 
-          <div
-            className="login-options"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-              marginBottom: "30px",
-            }}
-          >
-            <div
-              className="remember-group"
-              style={{ display: "flex", alignItems: "center", gap: "5px" }}
-            >
-              <input
-                type="checkbox"
-                id="remember"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                style={{ width: "16px", height: "16px", cursor: "pointer" }}
-              />
-              <label
-                htmlFor="remember"
-                style={{
-                  fontSize: "14px",
-                  color: "#666",
-                  cursor: "pointer",
-                  marginBottom: 0,
-                }}
-              >
-                로그인 상태 유지
-              </label>
-            </div>
-
-            <div className="find-group">
-              <span
-                className="find-link"
-                onClick={() => setFindModalOpen(true)}
-                style={{ cursor: "pointer", fontSize: "14px", color: "#888" }}
-              >
-                이메일/비밀번호 찾기
-              </span>
-            </div>
+          <div className="input-group">
+            <label htmlFor="login-password">비밀번호</label>
+            <input
+              id="login-password"
+              type="password"
+              placeholder="비밀번호를 입력해주세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
           </div>
 
-          <button type="submit" className="main-submit-btn login-btn">
-            로그인
+          <div className="login-options">
+            <button
+              type="button"
+              className="text-link-button"
+              onClick={() => setFindModalOpen(true)}
+            >
+              이메일/비밀번호 찾기
+            </button>
+          </div>
+
+          {message && <p className="form-message error">{message}</p>}
+
+          <button
+            type="submit"
+            className="main-submit-btn login-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "로그인 중..." : "로그인"}
           </button>
         </form>
-
-        <div className="divider">
-          <span>또는</span>
-        </div>
-
-        <div className="social-auth-group">
-          <button type="button" className="social-btn kakao">
-            <i className="ri-chat-fill"></i> 카카오로 시작하기
-          </button>
-          <button type="button" className="social-btn naver">
-            <span>N</span> 네이버로 시작하기
-          </button>
-          <button type="button" className="social-btn google">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-              alt="G"
-            />
-            구글로 시작하기
-          </button>
-        </div>
 
         <p className="bottom-link">
           아직 회원이 아니신가요? <Link to="/signup">회원가입</Link>

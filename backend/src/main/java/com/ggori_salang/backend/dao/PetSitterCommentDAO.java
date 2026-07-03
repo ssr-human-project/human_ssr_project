@@ -28,8 +28,8 @@ public class PetSitterCommentDAO {
     }
 
     public int insert(PetSitterCommentVO comment) {
-        String sql = "INSERT INTO PETSITTER_COMMENTS (comment_id, post_id, user_id, content) " +
-                "VALUES (SEQ_PETSITTER_COMMENT.NEXTVAL, ?, ?, ?)";
+        String sql = "INSERT INTO PETSITTER_COMMENTS (post_id, user_id, content) " +
+                "VALUES (?, ?, ?)";
         return jdbcTemplate.update(sql,
                 comment.getPostId(), comment.getUserId(), comment.getContent());
     }

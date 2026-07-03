@@ -71,7 +71,7 @@ public class ReviewService {
     // rating 갱신 메서드 추가
     private void updateCafeRating(int cafeId) {
         String sql = "UPDATE CAFES SET rating = " +
-                "(SELECT NVL(AVG(rating), 0) FROM REVIEWS WHERE cafe_id = ?) " +
+                "(SELECT IFNULL(AVG(rating), 0) FROM REVIEWS WHERE cafe_id = ?) " +
                 "WHERE cafe_id = ?";
         jdbcTemplate.update(sql, cafeId, cafeId);
     }

@@ -46,16 +46,16 @@ public class ReviewDAO {
     public int insert(ReviewVO review) {
         System.out.println("userId: " + review.getUserId());  // 추가
         System.out.println("cafeId: " + review.getCafeId());  // 추가
-        String sql = "INSERT INTO REVIEWS (review_id, user_id, cafe_id, title, content, rating) " +
-                "VALUES (SEQ_REVIEW.NEXTVAL, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO REVIEWS (user_id, cafe_id, title, content, rating) " +
+                "VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 review.getUserId(), review.getCafeId(),
                 review.getTitle(), review.getContent(), review.getRating());
     }
 
     public int insertImage(int reviewId, String imageUrl) {
-        String sql = "INSERT INTO REVIEW_IMAGES (image_id, review_id, image_url) " +
-                "VALUES (SEQ_REVIEW_IMAGE.NEXTVAL, ?, ?)";
+        String sql = "INSERT INTO REVIEW_IMAGES (review_id, image_url) " +
+                "VALUES (?, ?)";
         return jdbcTemplate.update(sql, reviewId, imageUrl);
     }
 
@@ -78,7 +78,7 @@ public class ReviewDAO {
 
     public int getLastInsertedId() {
         return jdbcTemplate.queryForObject(
-                "SELECT SEQ_REVIEW.CURRVAL FROM DUAL", Integer.class);
+                "SELECT LAST_INSERT_ID()", Integer.class);
     }
     public List<ReviewVO> findByCafeId(int cafeId) {
         String sql = "SELECT r.*, u.nickname, c.cafe_name FROM REVIEWS r " +

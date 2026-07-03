@@ -37,28 +37,16 @@ function toRegionId(val) {
 const instance = axios.create({
   baseURL: "http://localhost:8111",
   timeout: 10000,
+  withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
-
-// 요청 인터셉터: localStorage.token → Bearer 헤더
-// Login.js 기준 저장 키: "token" (문자열)
-instance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
 
 // 응답 인터셉터: 401 → 로그아웃
 instance.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-      ["token", "userId", "nickname", "role"].forEach((k) =>
-        localStorage.removeItem(k),
-      );
+    if (err.response?.status === 401 && !err.config?.skipAuthRedirect) {
+      ["userId", "nickname", "role"].forEach((k) => localStorage.removeItem(k));
       window.location.href = "/login";
     }
     return Promise.reject(err);
@@ -140,12 +128,18 @@ export const api = {
   // ── 인증 ─────────────────────────────────────────────
   auth: {
     // POST /api/auth/login  body: { email, password }
-    // 응답: { token, role, nickname, userId }
+    // 응답: { role, nickname, userId }
     login: async (email, password) => {
-      const response = await instance.post("/api/auth/login", {
-        email,
-        password,
-      });
+      const response = await instance.post(
+        "/api/auth/login",
+        {
+          email,
+          password,
+        },
+        {
+          skipAuthRedirect: true,
+        },
+      );
       return response.data;
     },
     signup: async (userData) => {
@@ -155,14 +149,24 @@ export const api = {
     checkEmail: async (email) => {
       const response = await instance.get("/api/auth/check-email", {
         params: { email },
+        skipAuthRedirect: true,
       });
       return response.data; // boolean
     },
     checkNickname: async (nickname) => {
       const response = await instance.get("/api/auth/check-nickname", {
         params: { nickname },
+        skipAuthRedirect: true,
       });
       return response.data; // boolean
+    },
+    logout: async () => {
+      const response = await instance.post("/api/auth/logout");
+      return response.data;
+    },
+    me: async (config = {}) => {
+      const response = await instance.get("/api/auth/me", config);
+      return response.data;
     },
   },
 

@@ -57,10 +57,9 @@ export default function CafeListItem({ cafe, initialLiked = false }) {
   const handleWish = async (e) => {
     e.stopPropagation(); // 카드 클릭 이벤트가 실행되어 상세페이지로 넘어가는 현상 방지
 
-    const token = localStorage.getItem("token");
     const userId = Number(localStorage.getItem("userId"));
 
-    if (!token || !userId) {
+    if (!userId) {
       alert("로그인이 필요한 서비스입니다.");
       navigate("/login");
       return;
@@ -70,15 +69,11 @@ export default function CafeListItem({ cafe, initialLiked = false }) {
       if (wished) {
         // 이미 찜한 상태 ➡️ 찜 해제 (DELETE 요청)
         // 백엔드 API 설계에 따라 주소를 확인해 보세요 (예: `/favorites/${userId}/${id}`)
-        await api.delete(`/favorites/${userId}/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.delete(`/favorites/${userId}/${id}`);
         setWished(false);
       } else {
         // 찜하지 않은 상태 ➡️ 찜 추가 (POST 요청)
-        await api.post(`/favorites`, { userId, cafeId: id }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.post(`/favorites`, { userId, cafeId: id });
         setWished(true);
       }
     } catch (err) {

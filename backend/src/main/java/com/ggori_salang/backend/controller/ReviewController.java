@@ -48,7 +48,11 @@ public class ReviewController {
      * }
      */
     @PostMapping
-    public ResponseEntity<String> writeReview(@RequestBody ReviewVO review) {
+    public ResponseEntity<String> writeReview(@RequestBody ReviewVO review,
+                                              Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        review.setUserId(userId);
+
         boolean isSuccess = reviewService.writeReview(review);
         return isSuccess
                 ? ResponseEntity.ok("리뷰 작성 성공")

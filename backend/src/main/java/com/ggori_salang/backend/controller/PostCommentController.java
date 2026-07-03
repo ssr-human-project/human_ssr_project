@@ -31,7 +31,11 @@ public class PostCommentController {
      * Body: { "postId": 1, "userId": 1, "content": "내용" }
      */
     @PostMapping
-    public ResponseEntity<?> writeComment(@RequestBody PostCommentVO comment) {
+    public ResponseEntity<?> writeComment(@RequestBody PostCommentVO comment,
+                                          Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
+        comment.setUserId(userId);
+
         // 프론트엔드에서 이미 JSON Body에 postId를 담아 보내므로 @PathVariable 없이 처리
         boolean isSuccess = postCommentService.writeComment(comment);
 

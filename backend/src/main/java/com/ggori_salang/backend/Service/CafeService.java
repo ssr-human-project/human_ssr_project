@@ -4,6 +4,7 @@ import com.ggori_salang.backend.dao.CafeDAO;
 import com.ggori_salang.backend.vo.CafeVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,7 @@ public class CafeService {
         return result;
     }
 
+    @Transactional
     public boolean createCafe(CafeVO cafe) {
         int result = cafeDAO.insertCafe(cafe);
 

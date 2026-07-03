@@ -46,19 +46,14 @@ const MyPage = () => {
 
   useEffect(() => {
     const fetchMyPageData = async () => {
-      const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
       const nickname = localStorage.getItem("nickname");
 
-      if (!token) {
+      if (!userId) {
         alert("로그인이 필요합니다.");
         navigate("/login");
         return;
       }
-
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
 
       const fallbackUser = {
         userId,
@@ -76,7 +71,6 @@ const MyPage = () => {
       try {
         const userResponse = await axios.get(
           `${API_BASE_URL}/api/users/${userId}`,
-          { headers },
         );
         setUserData({ ...fallbackUser, ...userResponse.data });
       } catch (error) {
@@ -87,7 +81,6 @@ const MyPage = () => {
       try {
         const petResponse = await axios.get(
           `${API_BASE_URL}/api/users/${userId}/pet`,
-          { headers },
         );
 
         if (petResponse.data) {
@@ -107,7 +100,6 @@ const MyPage = () => {
       try {
         const favoriteResponse = await axios.get(
           `${API_BASE_URL}/api/favorites/${userId}`,
-          { headers },
         );
 
         setMyFavorites(
@@ -121,7 +113,6 @@ const MyPage = () => {
       try {
         const postsResponse = await axios.get(
           `${API_BASE_URL}/api/my/${userId}/posts`,
-          { headers },
         );
         setMyPosts(Array.isArray(postsResponse.data) ? postsResponse.data : []);
       } catch (error) {
@@ -132,7 +123,6 @@ const MyPage = () => {
       try {
         const reviewsResponse = await axios.get(
           `${API_BASE_URL}/api/my/${userId}/reviews`,
-          { headers },
         );
         setMyReviews(
           Array.isArray(reviewsResponse.data) ? reviewsResponse.data : [],
@@ -157,10 +147,9 @@ const MyPage = () => {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
-    if (!userId || !token) {
+    if (!userId) {
       alert("로그인이 필요합니다.");
       navigate("/login");
       return;
@@ -171,10 +160,6 @@ const MyPage = () => {
       return;
     }
 
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-
     try {
       const petPayload = {
         ...petData,
@@ -184,7 +169,6 @@ const MyPage = () => {
       const petResponse = await axios.put(
         `${API_BASE_URL}/api/users/${userId}/pet`,
         petPayload,
-        { headers },
       );
 
       if (petResponse.data) {
@@ -201,7 +185,6 @@ const MyPage = () => {
       await axios.put(
         `${API_BASE_URL}/api/users/${userId}/phone`,
         { phone: userData.phone },
-        { headers },
       );
 
       alert("정보가 저장되었습니다.");

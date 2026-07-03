@@ -31,8 +31,13 @@ public class PetSitterCommentController {
      * body: { "userId": 1, "content": "댓글 내용" }
      */
     @PostMapping
-    public ResponseEntity<String> write(@PathVariable int postId, @RequestBody PetSitterCommentVO vo) {
+    public ResponseEntity<String> write(@PathVariable int postId,
+                                        @RequestBody PetSitterCommentVO vo,
+                                        Authentication authentication) {
+        int userId = (int) authentication.getPrincipal();
         vo.setPostId(postId);
+        vo.setUserId(userId);
+
         boolean isSuccess = petSitterCommentService.writeComment(vo);
         return isSuccess
                 ? ResponseEntity.ok("댓글 작성 성공")

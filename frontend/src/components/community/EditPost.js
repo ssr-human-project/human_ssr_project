@@ -70,8 +70,6 @@ const EditPost = () => {
   }, [id, location.state, navigate]);
 
   const handleUpdate = async () => {
-    const token = localStorage.getItem("token");
-
     if (!title.trim() || !content.trim()) {
       alert("모든 필드를 입력해주세요.");
       return;
@@ -83,8 +81,7 @@ const EditPost = () => {
         {
           title: title,
           content: content
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
 
       if (response.status === 200) {

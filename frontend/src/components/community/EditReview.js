@@ -81,7 +81,6 @@ const EditReview = () => {
   }, [id, location.state, navigate]);
 
   const handleUpdate = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId"); // 실제 로그인 유저 ID 가져오기
 
     if (!title.trim() || !content.trim() || !cafeName.trim()) {
@@ -106,12 +105,11 @@ const EditReview = () => {
         const response = await axios.put(
           `http://localhost:8111/api/reviews/${id}`,
           reviewData, // 위에서 만든 데이터 객체
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
+        {
+          headers: {
               'Content-Type': 'application/json'
-            }
           }
+        }
         );
 
         if (response.status === 200) {

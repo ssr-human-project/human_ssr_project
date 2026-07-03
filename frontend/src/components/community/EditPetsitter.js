@@ -71,8 +71,6 @@ const EditPetsitter = () => {
   }, [id, location.state, navigate]);
 
   const handleUpdate = async () => {
-    const token = localStorage.getItem("token");
-
     // 유효성 검사
     if (!title.trim() || !content.trim() || !region.trim()) {
       alert("모든 필드를 입력해주세요.");
@@ -86,8 +84,7 @@ const EditPetsitter = () => {
           title: title,
           content: content,
           region: region
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
 
       if (response.status === 200) {
