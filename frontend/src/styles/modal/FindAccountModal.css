@@ -87,6 +87,19 @@
   cursor: pointer;
 }
 
+.find-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.find-message {
+  margin: 12px 0 0;
+  color: #d4380d;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .find-result-box {
   margin-top: 20px;
   padding: 20px;
