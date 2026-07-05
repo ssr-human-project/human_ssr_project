@@ -118,4 +118,51 @@ public class AuthController {
     public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(authService.isNicknameDuplicated(nickname));
     }
+
+    /**
+     * 이메일 찾기
+     * POST /api/auth/find-email
+     * body: { "phone": "01012345678" }
+     */
+    @PostMapping("/find-email")
+    public ResponseEntity<?> findEmail(@RequestBody Map<String, String> request) {
+        return authService.findEmailByPhone(request.get("phone"))
+                .<ResponseEntity<?>>map(email -> ResponseEntity.ok(Map.of("email", email)))
+                .orElseGet(() -> ResponseEntity.status(404).body(Map.of("message", "일치하는 정보가 없습니다.")));
+    }
+
+    /**
+     * 비밀번호 재설정 전 회원 정보 확인
+     * POST /api/auth/verify-reset
+     * body: { "email": "user@example.com", "phone": "01012345678" }
+     */
+    @PostMapping("/verify-reset")
+    public ResponseEntity<?> verifyReset(@RequestBody Map<String, String> request) {
+        boolean verified = authService.verifyPasswordResetUser(
+                request.get("email"),
+                request.get("phone")
+        );
+
+        return verified
+                ? ResponseEntity.ok(Map.of("verified", true))
+                : ResponseEntity.status(404).body(Map.of("message", "정보가 일치하지 않습니다."));
+    }
+
+    /**
+     * 비밀번호 재설정
+     * POST /api/auth/reset-password
+     * body: { "email": "user@example.com", "phone": "01012345678", "newPassword": "password" }
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        boolean changed = authService.resetPassword(
+                request.get("email"),
+                request.get("phone"),
+                request.get("newPassword")
+        );
+
+        return changed
+                ? ResponseEntity.ok(Map.of("message", "비밀번호가 변경되었습니다."))
+                : ResponseEntity.status(404).body(Map.of("message", "정보가 일치하지 않습니다."));
+    }
 }

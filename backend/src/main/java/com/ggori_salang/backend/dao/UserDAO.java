@@ -28,6 +28,13 @@ public class UserDAO {
                 .stream().findFirst();
     }
 
+    public Optional<UserVO> findByPhone(String phone) {
+        String sql = "SELECT * FROM USERS WHERE REPLACE(REPLACE(phone, '-', ''), ' ', '') = ?";
+        return jdbcTemplate.query(sql,
+                        new BeanPropertyRowMapper<>(UserVO.class), phone)
+                .stream().findFirst();
+    }
+
     public boolean existsByEmail(String email) {
         String sql = "SELECT COUNT(*) FROM USERS WHERE email = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
@@ -45,6 +52,17 @@ public class UserDAO {
         return jdbcTemplate.update(sql,
                 user.getNickname(), user.getPhone(),
                 user.getPassword(), user.getUserId());
+    }
+
+    public int updatePasswordByEmailAndPhone(String email, String phone, String password) {
+        String sql = """
+            UPDATE USERS
+            SET password = ?
+            WHERE email = ?
+              AND REPLACE(REPLACE(phone, '-', ''), ' ', '') = ?
+        """;
+
+        return jdbcTemplate.update(sql, password, email, phone);
     }
     public int updatePhone(Long userId, String phone) {
 

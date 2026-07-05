@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +54,33 @@ public class AuthService {
 
     public boolean isNicknameDuplicated(String nickname) {
         return userDAO.existsByNickname(nickname);
+    }
+
+    public Optional<String> findEmailByPhone(String phone) {
+        return userDAO.findByPhone(normalizePhone(phone))
+                .map(UserVO::getEmail);
+    }
+
+    public boolean verifyPasswordResetUser(String email, String phone) {
+        if (email == null || email.isBlank()) return false;
+        return userDAO.findByEmail(email.trim())
+                .map(user -> normalizePhone(user.getPhone()).equals(normalizePhone(phone)))
+                .orElse(false);
+    }
+
+    public boolean resetPassword(String email, String phone, String newPassword) {
+        if (newPassword == null || newPassword.isBlank() || newPassword.length() < 8) return false;
+        if (!verifyPasswordResetUser(email, phone)) return false;
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        return userDAO.updatePasswordByEmailAndPhone(
+                email.trim(),
+                normalizePhone(phone),
+                encodedPassword
+        ) > 0;
+    }
+
+    private String normalizePhone(String phone) {
+        return phone == null ? "" : phone.replaceAll("\\D", "");
     }
 }

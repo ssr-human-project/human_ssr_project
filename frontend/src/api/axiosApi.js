@@ -160,6 +160,30 @@ export const api = {
       });
       return response.data; // boolean
     },
+    findEmail: async (phone) => {
+      const response = await instance.post(
+        "/api/auth/find-email",
+        { phone },
+        { skipAuthRedirect: true },
+      );
+      return response.data;
+    },
+    verifyReset: async ({ email, phone }) => {
+      const response = await instance.post(
+        "/api/auth/verify-reset",
+        { email, phone },
+        { skipAuthRedirect: true },
+      );
+      return response.data;
+    },
+    resetPassword: async ({ email, phone, newPassword }) => {
+      const response = await instance.post(
+        "/api/auth/reset-password",
+        { email, phone, newPassword },
+        { skipAuthRedirect: true },
+      );
+      return response.data;
+    },
     logout: async () => {
       const response = await instance.post("/api/auth/logout");
       return response.data;
