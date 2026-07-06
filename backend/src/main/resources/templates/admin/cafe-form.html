@@ -123,9 +123,6 @@
 </div>
 
 <script>
-    const CLOUD_NAME = "dysywlkhr";
-    const UPLOAD_PRESET = "GGORI_IMAGE";
-
     const imageInput = document.getElementById('imageInput');
     const previewBox = document.getElementById('previewBox');
     const imageUrlInputs = document.getElementById('imageUrlInputs');
@@ -136,42 +133,53 @@
         const files = Array.from(this.files);
         if (files.length === 0) return;
 
+        const invalidFile = files.find(file => !file.type.startsWith('image/') || file.size > 5 * 1024 * 1024);
+        if (invalidFile) {
+            alert('5MB 이하 이미지 파일만 업로드할 수 있습니다.');
+            this.value = '';
+            return;
+        }
+
         uploadingText.style.display = 'block';
         submitBtn.disabled = true;
 
-        for (const file of files) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', UPLOAD_PRESET);
+        const formData = new FormData();
+        files.forEach(file => formData.append('files', file));
 
-            try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                const url = data.secure_url;
+        try {
+            const res = await fetch('/api/uploads/images', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
 
-                // 미리보기 이미지 추가
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(error.message || '이미지 업로드 실패');
+            }
+
+            const data = await res.json();
+            const imageUrls = data.imageUrls || [];
+
+            imageUrls.forEach(url => {
                 const img = document.createElement('img');
                 img.src = url;
                 previewBox.appendChild(img);
 
-                // hidden input으로 URL 저장 (폼 제출 시 같이 전송)
                 const hidden = document.createElement('input');
                 hidden.type = 'hidden';
                 hidden.name = 'imageUrls';
                 hidden.value = url;
                 imageUrlInputs.appendChild(hidden);
-
-            } catch (err) {
-                console.error('업로드 실패:', err);
-                alert('이미지 업로드 실패!');
-            }
+            });
+        } catch (err) {
+            console.error('업로드 실패:', err);
+            alert(err.message || '이미지 업로드 실패!');
+        } finally {
+            uploadingText.style.display = 'none';
+            submitBtn.disabled = false;
+            this.value = '';
         }
-
-        uploadingText.style.display = 'none';
-        submitBtn.disabled = false;
     });
 </script>
 </body>

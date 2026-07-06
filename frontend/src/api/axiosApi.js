@@ -194,6 +194,18 @@ export const api = {
     },
   },
 
+  uploads: {
+    images: async (files) => {
+      const formData = new FormData();
+      Array.from(files ?? []).forEach((file) => formData.append("files", file));
+
+      const response = await instance.post("/api/uploads/images", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data.imageUrls ?? [];
+    },
+  },
+
   // ── 지역 ─────────────────────────────────────────────
   regions: {
     getAll: async () => {
@@ -332,23 +344,23 @@ export const api = {
   // ── 펫시터 ────────────────────────────────────────────
   sitters: {
     getAll: async () => {
-      const response = await instance.get("/api/pet-sitters");
+      const response = await instance.get("/api/pet-sitter");
       return response.data;
     },
     getById: async (id) => {
-      const response = await instance.get(`/api/pet-sitters/${id}`);
+      const response = await instance.get(`/api/pet-sitter/${id}`);
       return response.data;
     },
     create: async (sitter) => {
-      const response = await instance.post("/api/pet-sitters", sitter);
+      const response = await instance.post("/api/pet-sitter", sitter);
       return response.data;
     },
     update: async (id, sitter) => {
-      const response = await instance.put(`/api/pet-sitters/${id}`, sitter);
+      const response = await instance.put(`/api/pet-sitter/${id}`, sitter);
       return response.data;
     },
     delete: async (id) => {
-      await instance.delete(`/api/pet-sitters/${id}`);
+      await instance.delete(`/api/pet-sitter/${id}`);
     },
   },
 
