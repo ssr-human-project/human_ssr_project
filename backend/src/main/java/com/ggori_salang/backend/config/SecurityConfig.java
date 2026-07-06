@@ -71,7 +71,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         // 1. 모든 경로에 대한 OPTIONS 요청을 무조건 허용 (Preflight 해결)
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/uploads/images").authenticated()
                         .requestMatchers("/api/favorites/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/cafes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cafes").permitAll()

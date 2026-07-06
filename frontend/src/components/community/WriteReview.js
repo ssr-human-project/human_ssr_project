@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { reviewApi } from "../../api/reviewApi";
+import { api } from "../../api/axiosApi";
+import ImageUploader from "./ImageUploader";
 
 // --- 스타일 컴포넌트 ---
 const WriteContainer = styled.div`
@@ -45,6 +45,10 @@ const SubmitButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   &:hover { background: #e55a2b; }
+  &:disabled {
+    background: #ffc2ad;
+    cursor: not-allowed;
+  }
 `;
 
 const WriteReview = () => {
@@ -57,6 +61,8 @@ const WriteReview = () => {
   const [rating, setRating] = useState("5");
   const [selectedCafe, setSelectedCafe] = useState("");
   const [cafes, setCafes] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 변경 포인트 2: 1점 단위(1점부터 5점까지) 배열 생성
   const ratingOptions = Array.from({ length: 5 }, (_, i) => String(i + 1));
@@ -72,8 +78,8 @@ const WriteReview = () => {
 
     const fetchCafes = async () => {
       try {
-        const response = await axios.get("http://localhost:8111/api/cafes/all");
-        setCafes(response.data);
+        const data = await api.cafes.getAll();
+        setCafes(data);
       } catch (error) {
         console.error("카페 목록 로드 실패:", error);
       }
@@ -91,26 +97,23 @@ const WriteReview = () => {
       return;
     }
 
-    // 3. 데이터 구성
-    const reviewData = {
-      cafeId: parseInt(selectedCafe),
-      userId: Number(userId),
-      title: title,
-      content: content,
-      rating: parseFloat(rating) // 정수값이어도 안전하게 소수로 변환해서 전송 (예: 5 -> 5.0)
-    };
-
+    setIsSubmitting(true);
     try {
-      const response = await axios.post("http://localhost:8111/api/reviews", reviewData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const imageUrls = imageFiles.length
+        ? await api.uploads.images(imageFiles)
+        : [];
+
+      await api.reviews.create({
+        cafeId: parseInt(selectedCafe),
+        userId: Number(userId),
+        title,
+        content,
+        rating: parseFloat(rating),
+        imageUrls,
       });
 
-      if (response.status === 200 || response.status === 201) {
-        alert("리뷰가 성공적으로 등록되었습니다!");
-        navigate("/reviews");
-      }
+      alert("리뷰가 성공적으로 등록되었습니다!");
+      navigate("/reviews");
     } catch (error) {
       console.error("등록 에러:", error.response?.data || error.message);
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -119,6 +122,8 @@ const WriteReview = () => {
       } else {
         alert("리뷰 등록에 실패했습니다.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -169,7 +174,16 @@ const WriteReview = () => {
         />
       </div>
 
-      <SubmitButton onClick={handleRegister}>리뷰 등록하기</SubmitButton>
+      <Label>이미지</Label>
+      <ImageUploader
+        id="review-images"
+        files={imageFiles}
+        onChange={setImageFiles}
+      />
+
+      <SubmitButton onClick={handleRegister} disabled={isSubmitting}>
+        {isSubmitting ? "등록 중..." : "리뷰 등록하기"}
+      </SubmitButton>
     </WriteContainer>
   );
 };

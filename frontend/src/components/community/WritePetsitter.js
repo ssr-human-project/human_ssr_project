@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { api } from '../../api/axiosApi';
+import ImageUploader from './ImageUploader';
 
 // --- 스타일 컴포넌트 ---
 const WriteContainer = styled.div`
@@ -47,6 +48,10 @@ const SubmitButton = styled.button`
   cursor: pointer;
   transition: background 0.3s;
   &:hover { background: #e55a2b; }
+  &:disabled {
+    background: #ffc2ad;
+    cursor: not-allowed;
+  }
 `;
 
 const WritePetsitter = () => {
@@ -55,6 +60,8 @@ const WritePetsitter = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [region, setRegion] = useState('');
+  const [imageFiles, setImageFiles] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. 페이지 진입 시 로그인 체크
   useEffect(() => {
@@ -75,26 +82,22 @@ const WritePetsitter = () => {
       return;
     }
 
-    // 2. 고정값 1 대신 실제 userId 사용하도록 데이터 구성
-    const postData = {
-      title: title,
-      content: content,
-      region: region,
-      userId: Number(userId), // 숫자로 변환
-      imageUrls: []
-    };
-
+    setIsSubmitting(true);
     try {
-      const response = await axios.post('http://localhost:8111/api/pet-sitter', postData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const imageUrls = imageFiles.length
+        ? await api.uploads.images(imageFiles)
+        : [];
+
+      await api.sitters.create({
+        title,
+        content,
+        region,
+        userId: Number(userId),
+        imageUrls,
       });
 
-      if (response.status === 200 || response.status === 201) {
-        alert("성공적으로 등록되었습니다!");
-        navigate('/pet-sitter');
-      }
+      alert("성공적으로 등록되었습니다!");
+      navigate('/pet-sitter');
     } catch (error) {
       console.error("등록 에러:", error.response?.data || error.message);
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -103,6 +106,8 @@ const WritePetsitter = () => {
       } else {
         alert("등록에 실패했습니다.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -137,8 +142,15 @@ const WritePetsitter = () => {
         />
       </div>
 
-      <SubmitButton onClick={handleRegister}>
-        등록하기
+      <Label>이미지</Label>
+      <ImageUploader
+        id="petsitter-images"
+        files={imageFiles}
+        onChange={setImageFiles}
+      />
+
+      <SubmitButton onClick={handleRegister} disabled={isSubmitting}>
+        {isSubmitting ? "등록 중..." : "등록하기"}
       </SubmitButton>
     </WriteContainer>
   );
